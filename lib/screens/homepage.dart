@@ -1,8 +1,8 @@
-
 import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:unfocus/screens/ring.dart';
 
 import '../widgets/tile.dart';
@@ -22,13 +22,62 @@ class _HomePageState extends State<HomePage> {
 
   static StreamSubscription? subscription;
 
+  late Stream<StepCount> _stepCountStream;
+  late Stream<PedestrianStatus> _pedestrianStatusStream;
+  String _status = '?', _steps = '?';
+
+  double _breakDuration = 5;
+  double _duration = 45;
+  bool _requireWalking = true;
+  double walkingDistance = 10;
+
   @override
   void initState() {
     super.initState();
     loadAlarms();
     subscription ??= Alarm.ringStream.stream.listen(
-          (alarmSettings) => navigateToRingScreen(alarmSettings),
+      (alarmSettings) => navigateToRingScreen(alarmSettings),
     );
+    // initPlatformState();
+  }
+
+  void onStepCount(StepCount event) {
+    print(event);
+    setState(() {
+      _steps = event.steps.toString();
+    });
+  }
+
+  void onPedestrianStatusChanged(PedestrianStatus event) {
+    print(event);
+    setState(() {
+      _status = event.status;
+    });
+  }
+
+  void onPedestrianStatusError(error) {
+    print('onPedestrianStatusError: $error');
+    setState(() {
+      _status = 'Pedestrian Status not available';
+    });
+    print(_status);
+  }
+
+  void onStepCountError(error) {
+    print('onStepCountError: $error');
+    setState(() {
+      _steps = 'Step Count not available';
+    });
+  }
+
+  void initPlatformState() {
+    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
+    _pedestrianStatusStream.listen(onPedestrianStatusChanged).onError(onPedestrianStatusError);
+
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(onStepCount).onError(onStepCountError);
+
+    if (!mounted) return;
   }
 
   void loadAlarms() {
@@ -80,30 +129,132 @@ class _HomePageState extends State<HomePage> {
         title: Text(widget.title),
       ),
       body: SafeArea(
-        child: alarms.isNotEmpty
-            ? ListView.separated(
-          itemCount: alarms.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            return AlarmTile(
-              key: Key(alarms[index].id.toString()),
-              title: TimeOfDay(
-                hour: alarms[index].dateTime.hour,
-                minute: alarms[index].dateTime.minute,
-              ).format(context),
-              onPressed: () => navigateToAlarmScreen(alarms[index]),
-              onDismissed: () {
-                Alarm.stop(alarms[index].id).then((_) => loadAlarms());
-              },
-            );
-          },
-        )
-            : Center(
-          child: Text(
-            "No alarms set",
-            style: Theme.of(context).textTheme.titleMedium,
+        child:
+            // const Text(
+            //   'Steps Taken',
+            //   style: TextStyle(fontSize: 30),
+            // ),
+            // Text(
+            //   _steps,
+            //   style: const TextStyle(fontSize: 60),
+            // ),
+            // const Divider(
+            //   height: 100,
+            //   thickness: 0,
+            //   color: Colors.white,
+            // ),
+            // const Text(
+            //   'Pedestrian Status',
+            //   style: TextStyle(fontSize: 30),
+            // ),
+            // Icon(
+            //   _status == 'walking'
+            //       ? Icons.directions_walk
+            //       : _status == 'stopped'
+            //           ? Icons.accessibility_new
+            //           : Icons.error,
+            //   size: 100,
+            // ),
+            // Center(
+            //   child: Text(
+            //     _status,
+            //     style: _status == 'walking' || _status == 'stopped' ? const TextStyle(fontSize: 30) : const TextStyle(fontSize: 20, color: Colors.red),
+            //   ),
+            // ),
+            Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: alarms.isNotEmpty
+                ? Text('Hello')
+                // ? ListView.separated(
+                //     itemCount: alarms.length,
+                //     separatorBuilder: (context, index) => const Divider(height: 1),
+                //     itemBuilder: (context, index) {
+                //       return AlarmTile(
+                //         key: Key(alarms[index].id.toString()),
+                //         title: TimeOfDay(
+                //           hour: alarms[index].dateTime.hour,
+                //           minute: alarms[index].dateTime.minute,
+                //         ).format(context),
+                //         onPressed: () => navigateToAlarmScreen(alarms[index]),
+                //         onDismissed: () {
+                //           Alarm.stop(alarms[index].id).then((_) => loadAlarms());
+                //         },
+                //       );
+                //     },
+                //   )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Focus: ${_duration.toInt().toString()} minutes",
+                        style: const TextStyle(
+                          fontSize: 30,
+                        ),
+                      ),
+                      Slider(
+                        value: _duration,
+                        min: 1,
+                        max: 60,
+                        onChanged: (value) {
+                          setState(() {
+                            _duration = value;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Unfocus: ${_breakDuration.toInt().toString()} minutes",
+                        style: const TextStyle(
+                          fontSize: 30,
+                        ),
+                      ),
+                      Slider(
+                        value: _breakDuration,
+                        min: 1,
+                        max: 60,
+                        onChanged: (value) {
+                          setState(() {
+                            _breakDuration = value;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Require walking",
+                            style: const TextStyle(
+                              fontSize: 30,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,),
+                          Switch(
+                              value: _requireWalking,
+                              onChanged: (value) {
+                                setState(() {
+                                  _requireWalking = value;
+                                });
+                              }),
+                        ],
+                      ),
+
+                    ],
+                  ),
           ),
         ),
+        // : Center(
+        //     child: Text(
+        //       "No alarms set",
+        //       style: Theme.of(context).textTheme.titleMedium,
+        //     ),
+        //   ),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(10),
@@ -134,4 +285,8 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+}
+
+String formatDate(DateTime d) {
+  return d.toString().substring(0, 19);
 }
