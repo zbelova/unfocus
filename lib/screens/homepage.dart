@@ -122,11 +122,19 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      //   // Here we take the value from the MyHomePage object that was created by
+      //   // the App.build method, and use it to set our appbar title.
+      //   title: Text(widget.title),
+      // ),
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => navigateToAlarmScreen(null),
+        label: const Icon(Icons.settings),
+        elevation: 2.0,
       ),
       body: SafeArea(
         child:
@@ -256,33 +264,33 @@ class _HomePageState extends State<HomePage> {
         //     ),
         //   ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            FloatingActionButton(
-              onPressed: () {
-                final alarmSettings = AlarmSettings(
-                  id: 42,
-                  dateTime: DateTime.now(),
-                  assetAudioPath: 'assets/marimba.mp3',
-                  volumeMax: true,
-                );
-                Alarm.set(alarmSettings: alarmSettings);
-              },
-              backgroundColor: Colors.red,
-              heroTag: null,
-              child: const Text("RING NOW", textAlign: TextAlign.center),
-            ),
-            FloatingActionButton(
-              onPressed: () => navigateToAlarmScreen(null),
-              child: const Icon(Icons.alarm_add_rounded, size: 33),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.all(10),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       FloatingActionButton(
+      //         onPressed: () {
+      //           final alarmSettings = AlarmSettings(
+      //             id: 42,
+      //             dateTime: DateTime.now(),
+      //             assetAudioPath: 'assets/marimba.mp3',
+      //             volumeMax: true,
+      //           );
+      //           Alarm.set(alarmSettings: alarmSettings);
+      //         },
+      //         backgroundColor: Colors.red,
+      //         heroTag: null,
+      //         child: const Text("RING NOW", textAlign: TextAlign.center),
+      //       ),
+      //       FloatingActionButton(
+      //         onPressed: () => navigateToAlarmScreen(null),
+      //         child: const Icon(Icons.alarm_add_rounded, size: 33),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+     // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
