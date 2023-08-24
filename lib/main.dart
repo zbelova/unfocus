@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:unfocus/screens/homepage.dart';
+import 'package:unfocus/screens/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomePage(title: 'Unfocus'),
+      home: const HomePage(),
     );
   }
 }

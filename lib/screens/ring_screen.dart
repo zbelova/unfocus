@@ -1,5 +1,6 @@
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:unfocus/screens/home_screen.dart';
 
 class AlarmRingScreen extends StatelessWidget {
   final AlarmSettings alarmSettings;
@@ -33,27 +34,29 @@ class AlarmRingScreen extends StatelessWidget {
                           now.day,
                           now.hour,
                           now.minute,
-                          0,
-                          0,
-                        ).add(const Duration(minutes: 1)),
+                          now.second,
+                          now.millisecond,
+                        ).add(const Duration(seconds: 10)),
                       ),
                     ).then((_) => Navigator.pop(context));
                   },
                   child: Text(
-                    "Snooze",
+                    "Unfocus",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                RawMaterialButton(
-                  onPressed: () {
-                    Alarm.stop(alarmSettings.id)
-                        .then((_) => Navigator.pop(context));
-                  },
-                  child: Text(
-                    "Stop",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
+                // RawMaterialButton(
+                //   onPressed: () {
+                //     Alarm.stopAll()
+                //         .then((_) => Navigator.pushAndRemoveUntil(context,
+                //             MaterialPageRoute(builder: (_) => const HomePage()),
+                //             (route) => false));
+                //   },
+                //   child: Text(
+                //     "Stop",
+                //     style: Theme.of(context).textTheme.titleLarge,
+                //   ),
+                // ),
               ],
             ),
           ],

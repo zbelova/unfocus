@@ -1,17 +1,20 @@
 import 'dart:async';
 
 import 'package:alarm/alarm.dart';
+import 'package:alarm/service/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:unfocus/screens/ring.dart';
+import 'package:unfocus/screens/focus_screen.dart';
+import 'package:unfocus/screens/ring_screen.dart';
 
 import '../widgets/tile.dart';
-import 'edit_alarm.dart';
+import 'edit_alarm_screen.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  final AlarmSettings? alarmSettings;
 
-  final String title;
+  const HomePage({super.key, this.alarmSettings});
+
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -38,7 +41,47 @@ class _HomePageState extends State<HomePage> {
     subscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
     );
+
+    creating = widget.alarmSettings == null;
+
+    if (creating) {
+      final dt = DateTime.now().add(const Duration(minutes: 1));
+      selectedTime = TimeOfDay(hour: dt.hour, minute: dt.minute);
+      loopAudio = true;
+      vibrate = true;
+      volumeMax = true;
+      showNotification = true;
+      assetAudio = 'assets/marimba.mp3';
+    } else {
+      selectedTime = TimeOfDay(
+        hour: widget.alarmSettings!.dateTime.hour,
+        minute: widget.alarmSettings!.dateTime.minute,
+      );
+      loopAudio = widget.alarmSettings!.loopAudio;
+      vibrate = widget.alarmSettings!.vibrate;
+      volumeMax = widget.alarmSettings!.volumeMax;
+      showNotification = widget.alarmSettings!.notificationTitle != null &&
+          widget.alarmSettings!.notificationTitle!.isNotEmpty &&
+          widget.alarmSettings!.notificationBody != null &&
+          widget.alarmSettings!.notificationBody!.isNotEmpty;
+      assetAudio = widget.alarmSettings!.assetAudioPath;
+    }
     // initPlatformState();
+  }
+
+  bool isToday() {
+    final now = DateTime.now();
+    final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      selectedTime.hour,
+      selectedTime.minute,
+      0,
+      0,
+    );
+
+    return now.isBefore(dateTime);
   }
 
   void onStepCount(StepCount event) {
@@ -81,6 +124,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void loadAlarms() {
+   // AlarmStorage.unsaveAlarm(35120);
     setState(() {
       alarms = Alarm.getAlarms();
       alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
@@ -111,6 +155,67 @@ class _HomePageState extends State<HomePage> {
         });
 
     if (res != null && res == true) loadAlarms();
+  }
+
+  bool loading = false;
+
+  late bool creating;
+  late TimeOfDay selectedTime;
+  late bool loopAudio;
+  late bool vibrate;
+  late bool volumeMax;
+  late bool showNotification;
+  late String assetAudio;
+
+  void saveAlarm() {
+    setState(() => loading = true);
+    Alarm.set(alarmSettings: buildAlarmSettings()).then((res) {
+      if (res) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const FocusScreen()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error saving alarm')));
+      }
+    });
+    setState(() => loading = false);
+  }
+
+  AlarmSettings buildAlarmSettings() {
+    final now = DateTime.now();
+    final id = creating ? DateTime.now().millisecondsSinceEpoch % 100000 : widget.alarmSettings!.id;
+
+    DateTime dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute,
+      //selectedTime.hour,
+      //selectedTime.minute,
+      now.second,
+      now.millisecond,
+    ).add(const Duration(seconds: 10));
+    if (dateTime.isBefore(DateTime.now())) {
+      dateTime = dateTime.add(const Duration(days: 1));
+    }
+
+    final alarmSettings = AlarmSettings(
+      id: id,
+      dateTime: dateTime,
+      loopAudio: loopAudio,
+      vibrate: vibrate,
+      volumeMax: volumeMax,
+      notificationTitle: showNotification ? 'Alarm example' : null,
+      notificationBody: showNotification ? 'Your alarm ($id) is ringing' : null,
+      assetAudioPath: assetAudio,
+      stopOnNotificationOpen: false,
+    );
+    return alarmSettings;
+  }
+
+  void deleteAlarm() {
+    Alarm.stop(widget.alarmSettings!.id).then((res) {
+      if (res) Navigator.pop(context, true);
+    });
   }
 
   @override
@@ -172,8 +277,9 @@ class _HomePageState extends State<HomePage> {
             Padding(
           padding: const EdgeInsets.all(20.0),
           child: Center(
-            child: alarms.isNotEmpty
-                ? Text('Hello')
+            child:
+            //alarms.isNotEmpty
+               //
                 // ? ListView.separated(
                 //     itemCount: alarms.length,
                 //     separatorBuilder: (context, index) => const Divider(height: 1),
@@ -191,13 +297,14 @@ class _HomePageState extends State<HomePage> {
                 //       );
                 //     },
                 //   )
-                : Column(
+                //:
+            Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         "Focus: ${_duration.toInt().toString()} minutes",
-                        style: const TextStyle(
-                          fontSize: 30,
+                        style: TextStyle(
+                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
                         ),
                       ),
                       Slider(
@@ -210,13 +317,13 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Text(
                         "Unfocus: ${_breakDuration.toInt().toString()} minutes",
-                        style: const TextStyle(
-                          fontSize: 30,
+                        style: TextStyle(
+                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
                         ),
                       ),
                       Slider(
@@ -229,20 +336,21 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                           Text(
                             "Require walking",
-                            style: const TextStyle(
-                              fontSize: 30,
+                            style: TextStyle(
+                              fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
                             ),
                           ),
-                          SizedBox(
-                            width: 20,),
+                          const SizedBox(
+                            width: 20,
+                          ),
                           Switch(
                               value: _requireWalking,
                               onChanged: (value) {
@@ -252,7 +360,23 @@ class _HomePageState extends State<HomePage> {
                               }),
                         ],
                       ),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      SizedBox(
+                        width: 200,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            saveAlarm();
+                          },
+                          child: Text("Start focus",
+                              style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
 
+                              )),
+                        ),
+                      ),
                     ],
                   ),
           ),
@@ -290,7 +414,7 @@ class _HomePageState extends State<HomePage> {
       //     ],
       //   ),
       // ),
-     // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
