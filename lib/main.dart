@@ -1,14 +1,15 @@
 import 'dart:async';
-
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:unfocus/screens/home_screen.dart';
 
+import 'data/user_preferences.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
+  await UserPreferences().init();
   await Alarm.init(showDebugLogs: true);
   runApp(const MyApp());
 }

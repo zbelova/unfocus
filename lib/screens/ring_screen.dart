@@ -45,18 +45,18 @@ class AlarmRingScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                // RawMaterialButton(
-                //   onPressed: () {
-                //     Alarm.stopAll()
-                //         .then((_) => Navigator.pushAndRemoveUntil(context,
-                //             MaterialPageRoute(builder: (_) => const HomePage()),
-                //             (route) => false));
-                //   },
-                //   child: Text(
-                //     "Stop",
-                //     style: Theme.of(context).textTheme.titleLarge,
-                //   ),
-                // ),
+                RawMaterialButton(
+                  onPressed: () {
+                    Alarm.stopAll()
+                        .then((_) => Navigator.pushAndRemoveUntil(context,
+                            MaterialPageRoute(builder: (_) => const HomePage()),
+                            (route) => false));
+                  },
+                  child: Text(
+                    "Stop",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
               ],
             ),
           ],

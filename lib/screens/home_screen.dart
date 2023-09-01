@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm/service/storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:unfocus/data/user_preferences.dart';
 import 'package:unfocus/screens/focus_screen.dart';
 import 'package:unfocus/screens/ring_screen.dart';
 
@@ -14,7 +16,6 @@ class HomePage extends StatefulWidget {
   final AlarmSettings? alarmSettings;
 
   const HomePage({super.key, this.alarmSettings});
-
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,11 +29,19 @@ class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
   String _status = '?', _steps = '?';
-
-  double _breakDuration = 5;
-  double _duration = 45;
-  bool _requireWalking = true;
-  double walkingDistance = 10;
+  Map<String, dynamic> _settings = {};
+  //double? _unfocusDuration;
+//   late double _focusDuration;
+//   late bool _requireWalking;
+//   late double _walkingDistance;
+   late bool creating;
+//
+// // late TimeOfDay selectedTime;
+//   late bool _loopAudio;
+//   late bool _vibrate;
+//   late bool _volumeMax;
+//   late bool _showNotification;
+//   late String _assetAudio;
 
   @override
   void initState() {
@@ -42,47 +51,67 @@ class _HomePageState extends State<HomePage> {
       (alarmSettings) => navigateToRingScreen(alarmSettings),
     );
 
-    creating = widget.alarmSettings == null;
-
-    if (creating) {
-      final dt = DateTime.now().add(const Duration(minutes: 1));
-      selectedTime = TimeOfDay(hour: dt.hour, minute: dt.minute);
-      loopAudio = true;
-      vibrate = true;
-      volumeMax = true;
-      showNotification = true;
-      assetAudio = 'assets/marimba.mp3';
-    } else {
-      selectedTime = TimeOfDay(
-        hour: widget.alarmSettings!.dateTime.hour,
-        minute: widget.alarmSettings!.dateTime.minute,
-      );
-      loopAudio = widget.alarmSettings!.loopAudio;
-      vibrate = widget.alarmSettings!.vibrate;
-      volumeMax = widget.alarmSettings!.volumeMax;
-      showNotification = widget.alarmSettings!.notificationTitle != null &&
-          widget.alarmSettings!.notificationTitle!.isNotEmpty &&
-          widget.alarmSettings!.notificationBody != null &&
-          widget.alarmSettings!.notificationBody!.isNotEmpty;
-      assetAudio = widget.alarmSettings!.assetAudioPath;
-    }
+    _initAlarmSettings();
     // initPlatformState();
   }
 
-  bool isToday() {
-    final now = DateTime.now();
-    final dateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      selectedTime.hour,
-      selectedTime.minute,
-      0,
-      0,
-    );
+  _initAlarmSettings() {
+    _settings = {
+      'unfocusDuration': UserPreferences().getUnfocusDuration(),
+      'focusDuration': UserPreferences().getFocusDuration(),
+      'requireWalking': UserPreferences().getRequireWalking(),
+      'walkingDistance': UserPreferences().getWalkingDistance(),
+      'loopAudio': UserPreferences().getLoopAudio(),
+      'vibration': UserPreferences().getVibration(),
+      'volumeMax': UserPreferences().getVolumeMax(),
+      'showNotification': UserPreferences().getShowNotification(),
+      'assetAudionPath': UserPreferences().getAssetAudionPath(),
+    };
+    // _unfocusDuration =
+    // _focusDuration = ;
+    // _requireWalking = ;
+    // _walkingDistance = ;
+    // _loopAudio = ;
+    // _vibrate = ;
+    // _volumeMax = ;
+    // _showNotification = ;
+    // _assetAudio = ;
 
-    return now.isBefore(dateTime);
+    creating = widget.alarmSettings == null;
+
+    // if (creating) {
+    //   loopAudio = true;
+    //   vibrate = true;
+    //   volumeMax = true;
+    //   showNotification = true;
+    //   assetAudio = 'assets/marimba.mp3';
+    // } else {
+    //   loopAudio = widget.alarmSettings!.loopAudio;
+    //   vibrate = widget.alarmSettings!.vibrate;
+    //   volumeMax = widget.alarmSettings!.volumeMax;
+    //   showNotification = widget.alarmSettings!.notificationTitle != null &&
+    //       widget.alarmSettings!.notificationTitle!.isNotEmpty &&
+    //       widget.alarmSettings!.notificationBody != null &&
+    //       widget.alarmSettings!.notificationBody!.isNotEmpty;
+    //   assetAudio = widget.alarmSettings!.assetAudioPath;
+    // }
   }
+
+  // bool isToday() {
+  //   final now = DateTime.now();
+  //   final dateTime = DateTime(
+  //     now.year,
+  //     now.month,
+  //     now.day,
+  //     selectedTime.hour,
+  //     selectedTime.minute,
+  //     0,
+  //     0,
+  //   );
+  //
+  //   return now.isBefore(dateTime);
+  // }
+
 
   void onStepCount(StepCount event) {
     print(event);
@@ -113,7 +142,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void initPlatformState() {
+  void initWalkingState() {
     _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
     _pedestrianStatusStream.listen(onPedestrianStatusChanged).onError(onPedestrianStatusError);
 
@@ -124,7 +153,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void loadAlarms() {
-   // AlarmStorage.unsaveAlarm(35120);
+    // AlarmStorage.unsaveAlarm(35120);
     setState(() {
       alarms = Alarm.getAlarms();
       alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
@@ -140,7 +169,7 @@ class _HomePageState extends State<HomePage> {
     loadAlarms();
   }
 
-  Future<void> navigateToAlarmScreen(AlarmSettings? settings) async {
+  Future<void> navigateToAlarmScreen(AlarmSettings? alarmSettings) async {
     final res = await showModalBottomSheet<bool?>(
         context: context,
         isScrollControlled: true,
@@ -150,7 +179,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context) {
           return FractionallySizedBox(
             heightFactor: 0.7,
-            child: AlarmEditScreen(alarmSettings: settings),
+            child: AlarmEditScreen(alarmSettings: alarmSettings, settings: _settings),
           );
         });
 
@@ -158,14 +187,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool loading = false;
-
-  late bool creating;
-  late TimeOfDay selectedTime;
-  late bool loopAudio;
-  late bool vibrate;
-  late bool volumeMax;
-  late bool showNotification;
-  late String assetAudio;
 
   void saveAlarm() {
     setState(() => loading = true);
@@ -189,8 +210,6 @@ class _HomePageState extends State<HomePage> {
       now.day,
       now.hour,
       now.minute,
-      //selectedTime.hour,
-      //selectedTime.minute,
       now.second,
       now.millisecond,
     ).add(const Duration(seconds: 10));
@@ -201,12 +220,12 @@ class _HomePageState extends State<HomePage> {
     final alarmSettings = AlarmSettings(
       id: id,
       dateTime: dateTime,
-      loopAudio: loopAudio,
-      vibrate: vibrate,
-      volumeMax: volumeMax,
-      notificationTitle: showNotification ? 'Alarm example' : null,
-      notificationBody: showNotification ? 'Your alarm ($id) is ringing' : null,
-      assetAudioPath: assetAudio,
+      loopAudio: _settings['loopAudio'],
+      vibrate: _settings['vibration'],
+      volumeMax: _settings['volumeMax'],
+      notificationTitle: _settings['showNotification'] ? 'Unfocus!' : null,
+      notificationBody: _settings['showNotification'] ? 'Time to unfocus' : null,
+      assetAudioPath: _settings['assetAudionPath'],
       stopOnNotificationOpen: false,
     );
     return alarmSettings;
@@ -277,108 +296,95 @@ class _HomePageState extends State<HomePage> {
             Padding(
           padding: const EdgeInsets.all(20.0),
           child: Center(
-            child:
-            //alarms.isNotEmpty
-               //
-                // ? ListView.separated(
-                //     itemCount: alarms.length,
-                //     separatorBuilder: (context, index) => const Divider(height: 1),
-                //     itemBuilder: (context, index) {
-                //       return AlarmTile(
-                //         key: Key(alarms[index].id.toString()),
-                //         title: TimeOfDay(
-                //           hour: alarms[index].dateTime.hour,
-                //           minute: alarms[index].dateTime.minute,
-                //         ).format(context),
-                //         onPressed: () => navigateToAlarmScreen(alarms[index]),
-                //         onDismissed: () {
-                //           Alarm.stop(alarms[index].id).then((_) => loadAlarms());
-                //         },
-                //       );
-                //     },
-                //   )
-                //:
-            Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Focus: ${_duration.toInt().toString()} minutes",
-                        style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                        ),
-                      ),
-                      Slider(
-                        value: _duration,
-                        min: 1,
-                        max: 60,
-                        onChanged: (value) {
-                          setState(() {
-                            _duration = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "Unfocus: ${_breakDuration.toInt().toString()} minutes",
-                        style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                        ),
-                      ),
-                      Slider(
-                        value: _breakDuration,
-                        min: 1,
-                        max: 60,
-                        onChanged: (value) {
-                          setState(() {
-                            _breakDuration = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                           Text(
-                            "Require walking",
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Switch(
-                              value: _requireWalking,
-                              onChanged: (value) {
-                                setState(() {
-                                  _requireWalking = value;
-                                });
-                              }),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      ),
-                      SizedBox(
-                        width: 200,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            saveAlarm();
-                          },
-                          child: Text("Start focus",
-                              style: TextStyle(
-                                fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-
-                              )),
-                        ),
-                      ),
-                    ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Focus: ${_settings['focusDuration'].toInt().toString()} minutes",
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
                   ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: CupertinoSlider(
+                    value: _settings['focusDuration'],
+                    min: 1,
+                    max: 60,
+                    onChanged: (value) {
+                      setState(() {
+                        _settings['focusDuration'] = value;
+                      });
+                      UserPreferences().setFocusDuration(value);
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Unfocus: ${_settings['unfocusDuration']!.toInt().toString()} minutes",
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: CupertinoSlider(
+                    value: _settings['unfocusDuration']!,
+                    min: 1,
+                    max: 60,
+                    onChanged: (value) {
+                      setState(() {
+                        _settings['unfocusDuration'] = value;
+                      });
+                      UserPreferences().setUnfocusDuration(value);
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Require walking to unfocus",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Switch(
+                        value: _settings['requireWalking'],
+                        onChanged: (value) {
+                          setState(() {
+                            _settings['requireWalking'] = value;
+                          });
+                          UserPreferences().setRequireWalking(value);
+                        }),
+                  ],
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      saveAlarm();
+                    },
+                    child: Text("Start focus",
+                        style: TextStyle(
+                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                        )),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         // : Center(
