@@ -1,6 +1,4 @@
-import 'dart:ffi';
 
-import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 
 import '../data/user_preferences.dart';
@@ -16,33 +14,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, dynamic> _newSettings = {};
   final TextEditingController _walkingDistanceController = TextEditingController();
 
-  // late bool creating;
-  // //late TimeOfDay selectedTime;
-  // late bool loopAudio;
-  // late bool vibrate;
-  // late bool volumeMax;
-  // late bool showNotification;
-  // late String assetAudio;
-
-  // bool isToday() {
-  //   final now = DateTime.now();
-  //   final dateTime = DateTime(
-  //     now.year,
-  //     now.month,
-  //     now.day,
-  //     selectedTime.hour,
-  //     selectedTime.minute,
-  //     0,
-  //     0,
-  //   );
-  //
-  //   return now.isBefore(dateTime);
-  // }
-
   @override
   void initState() {
     super.initState();
-    //_newSettings = widget.settings;
     _newSettings = {
       'unfocusDuration': UserPreferences().getUnfocusDuration(),
       'focusDuration': UserPreferences().getFocusDuration(),
@@ -55,72 +29,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
     _walkingDistanceController.text = _newSettings['walkingDistance'].round().toString();
-    // creating = widget.alarmSettings == null;
-    //
-    // if (creating) {
-    //   // final dt = DateTime.now().add(const Duration(minutes: 1));
-    //   // selectedTime = TimeOfDay(hour: dt.hour, minute: dt.minute);
-    //   loopAudio = true;
-    //   vibrate = true;
-    //   volumeMax = true;
-    //   showNotification = true;
-    //   assetAudio = 'assets/marimba.mp3';
-    // } else {
-    //   selectedTime = TimeOfDay(
-    //     hour: widget.alarmSettings!.dateTime.hour,
-    //     minute: widget.alarmSettings!.dateTime.minute,
-    //   );
-    //   loopAudio = widget.alarmSettings!.loopAudio;
-    //   vibrate = widget.alarmSettings!.vibrate;
-    //   volumeMax = widget.alarmSettings!.volumeMax;
-    //   showNotification = widget.alarmSettings!.notificationTitle != null &&
-    //       widget.alarmSettings!.notificationTitle!.isNotEmpty &&
-    //       widget.alarmSettings!.notificationBody != null &&
-    //       widget.alarmSettings!.notificationBody!.isNotEmpty;
-    //   assetAudio = widget.alarmSettings!.assetAudioPath;
-    // }
   }
 
-  // Future<void> pickTime() async {
-  //   final res = await showTimePicker(
-  //     initialTime: selectedTime,
-  //     context: context,
-  //   );
-  //   if (res != null) setState(() => selectedTime = res);
-  // }
-
-  // AlarmSettings buildAlarmSettings() {
-  //   final now = DateTime.now();
-  //   // final id = creating
-  //   //     ? DateTime.now().millisecondsSinceEpoch % 100000
-  //   //     : widget.alarmSettings!.id;
-  //
-  //   DateTime dateTime = DateTime(
-  //     now.year,
-  //     now.month,
-  //     now.day,
-  //     now.minute,
-  //     now.second,
-  //     0,
-  //     0,
-  //   );
-  //   if (dateTime.isBefore(DateTime.now())) {
-  //     dateTime = dateTime.add(const Duration(days: 1));
-  //   }
-  //
-  //   final alarmSettings = AlarmSettings(
-  //     id: id,
-  //     dateTime: dateTime,
-  //     loopAudio: loopAudio,
-  //     vibrate: vibrate,
-  //     volumeMax: volumeMax,
-  //     notificationTitle: showNotification ? 'Alarm example' : null,
-  //     notificationBody: showNotification ? 'Your alarm ($id) is ringing' : null,
-  //     assetAudioPath: assetAudio,
-  //     stopOnNotificationOpen: false,
-  //   );
-  //   return alarmSettings;
-  // }
 
   @override
   void dispose() {
@@ -143,20 +53,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.pop(context, true);
     setState(() => loading = false);
   }
-
-  // void saveAlarm() {
-  //   setState(() => loading = true);
-  //   Alarm.set(alarmSettings: buildAlarmSettings()).then((res) {
-  //     if (res) Navigator.pop(context, true);
-  //   });
-  //   setState(() => loading = false);
-  // }
-  //
-  // void deleteAlarm() {
-  //   Alarm.stop(widget.alarmSettings!.id).then((res) {
-  //     if (res) Navigator.pop(context, true);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,27 +82,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
-          // Text(
-          //   '${isToday() ? 'Today' : 'Tomorrow'} at',
-          //   style: Theme.of(context)
-          //       .textTheme
-          //       .titleMedium!
-          //       .copyWith(color: Colors.blueAccent.withOpacity(0.8)),
-          // ),
-          // RawMaterialButton(
-          //   onPressed: pickTime,
-          //   fillColor: Colors.grey[200],
-          //   child: Container(
-          //     margin: const EdgeInsets.all(20),
-          //     child: Text(
-          //       selectedTime.format(context),
-          //       style: Theme.of(context)
-          //           .textTheme
-          //           .displayMedium!
-          //           .copyWith(color: Colors.blueAccent),
-          //     ),
-          //   ),
-          // ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -223,13 +98,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 50,
                 height: 40,
                 child: TextField(
-
                   textAlign: TextAlign.center,
                   keyboardType: TextInputType.number,
                   controller: _walkingDistanceController,
-                  // decoration: InputDecoration(
-                  //   border: OutlineInputBorder(),
-                  // ),
                 ),
               ),
             ],
@@ -325,18 +196,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(
             height: 10,
           ),
-          // if (!creating)
-          //   TextButton(
-          //     onPressed: deleteAlarm,
-          //     child: Text(
-          //       'Delete Alarm',
-          //       style: Theme.of(context)
-          //           .textTheme
-          //           .titleMedium!
-          //           .copyWith(color: Colors.red),
-          //     ),
-          //   ),
-          // const SizedBox(),
         ],
       ),
     );
