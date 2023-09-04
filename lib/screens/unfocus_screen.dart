@@ -19,15 +19,22 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   Map<String, dynamic> _settings = {};
   Timer? _timer;
   int _current = 0;
+  bool _unfocusRunning = false;
+  bool _showTimer = false;
+  bool _walkingRequired = false;
+  String _unfocusText = 'Unfocus';
+  bool _buttonDelaid = false;
 
   void _startTimer() {
+    setState(() {
+      _unfocusRunning = true;
+    });
 
     //var duration = Duration(minutes: 1);
     var duration = Duration(seconds: 1);
     _timer = Timer.periodic(
       duration,
       (Timer timer) => setState(() {
-        print('timer');
         if (_current <= 0) {
           timer.cancel();
           _setNewAlarm();
@@ -56,8 +63,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     ).then((_) => Navigator.pop(context));
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -73,11 +78,21 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
     _current = 15;
+    _walkingRequired = _settings['requireWalking'];
+    if (_walkingRequired) {
+      _buttonDelaid = true;
+      Timer(Duration(seconds: 5), () {
+        setState(() {
+          _buttonDelaid = false;
+        });
+      });
+      _unfocusText = "I don't want to walk :(";
+    }
   }
 
   @override
   void dispose() {
-    _timer!.cancel();
+    if (_timer != null) _timer!.cancel();
     super.dispose();
   }
 
@@ -85,59 +100,93 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // Text(
-            //   "You alarm (${widget.alarmSettings.id}) is ringing...",
-            //   style: Theme.of(context).textTheme.titleLarge,
-            // ),
-            // const Text("🔔", style: TextStyle(fontSize: 50)),
-            Text('Time to Unfocus!'),
-            //show timer widget
-            Text(
-              _formatSecondsToMinutes(_current),
-              style: const TextStyle(fontSize: 30),
-            ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('Time to Unfocus!'),
+              if (!_showTimer && !_buttonDelaid)
+                ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showTimer = true;
+                      });
+                      _startTimer();
+                    },
+                    child: Text(_unfocusText)),
+              //show timer widget
+              if (_showTimer)
+                Text(
+                  _formatSecondsToMinutes(_current),
+                  style: const TextStyle(fontSize: 30),
+                ),
 
-            ElevatedButton(onPressed: _startTimer, child: Text('Unfocus')),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                RawMaterialButton(
-                  onPressed: () {
-                    final now = DateTime.now();
-                    Alarm.set(
-                      alarmSettings: widget.alarmSettings.copyWith(
-                        dateTime: DateTime(
-                          now.year,
-                          now.month,
-                          now.day,
-                          now.hour,
-                          now.minute,
-                          now.second,
-                          now.millisecond,
-                        ).add(Duration(minutes: _settings['unfocusDuration'].round())),
+              if (_showTimer)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // RawMaterialButton(
+                    //   onPressed: () {
+                    //     final now = DateTime.now();
+                    //     Alarm.set(
+                    //       alarmSettings: widget.alarmSettings.copyWith(
+                    //         dateTime: DateTime(
+                    //           now.year,
+                    //           now.month,
+                    //           now.day,
+                    //           now.hour,
+                    //           now.minute,
+                    //           now.second,
+                    //           now.millisecond,
+                    //         ).add(Duration(minutes: _settings['unfocusDuration'].round())),
+                    //       ),
+                    //     ).then((_) => Navigator.pop(context));
+                    //   },
+                    //   child: Text(
+                    //     "Set new focus",
+                    //     style: Theme.of(context).textTheme.titleLarge,
+                    //   ),
+                    // ),
+                    _unfocusRunning
+                        ? Container(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_timer != null) _timer!.cancel();
+                                setState(() {
+                                  _unfocusRunning = false;
+                                });
+                              },
+                              child: Text(
+                                "Pause",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            child: ElevatedButton(
+                              onPressed: _startTimer,
+                              child: Text(
+                                "Resume",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                          ),
+
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_timer != null) _timer!.cancel();
+                        Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
+                      },
+                      child: Text(
+                        "Stop",
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                    ).then((_) => Navigator.pop(context));
-                  },
-                  child: Text(
-                    "Set new focus",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                    ),
+                  ],
                 ),
-                RawMaterialButton(
-                  onPressed: () {
-                    Alarm.stopAll().then((_) => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomePage()), (route) => false));
-                  },
-                  child: Text(
-                    "Stop",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
