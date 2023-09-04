@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:unfocus/data/user_preferences.dart';
 import 'package:unfocus/screens/focus_screen.dart';
-import 'package:unfocus/screens/ring_screen.dart';
+import 'package:unfocus/screens/unfocus_screen.dart';
 
 import '../widgets/tile.dart';
-import 'edit_alarm_screen.dart';
+import 'settings_screen.dart';
 
 class HomePage extends StatefulWidget {
   final AlarmSettings? alarmSettings;
@@ -67,16 +67,6 @@ class _HomePageState extends State<HomePage> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    // _unfocusDuration =
-    // _focusDuration = ;
-    // _requireWalking = ;
-    // _walkingDistance = ;
-    // _loopAudio = ;
-    // _vibrate = ;
-    // _volumeMax = ;
-    // _showNotification = ;
-    // _assetAudio = ;
-
     creating = widget.alarmSettings == null;
 
     // if (creating) {
@@ -169,7 +159,7 @@ class _HomePageState extends State<HomePage> {
     loadAlarms();
   }
 
-  Future<void> navigateToAlarmScreen(AlarmSettings? alarmSettings) async {
+  Future<void> navigateToSettingsScreen(AlarmSettings? alarmSettings) async {
     final res = await showModalBottomSheet<bool?>(
         context: context,
         isScrollControlled: true,
@@ -179,7 +169,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context) {
           return FractionallySizedBox(
             heightFactor: 0.7,
-            child: AlarmEditScreen(alarmSettings: alarmSettings, settings: _settings),
+            child: SettingsScreen(),
           );
         });
 
@@ -253,12 +243,13 @@ class _HomePageState extends State<HomePage> {
       //   title: Text(widget.title),
       // ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
 
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => navigateToAlarmScreen(null),
+        onPressed: () => navigateToSettingsScreen(null),
         label: const Icon(Icons.settings),
         elevation: 2.0,
+
       ),
       body: SafeArea(
         child:

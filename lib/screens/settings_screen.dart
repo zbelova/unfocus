@@ -1,22 +1,20 @@
+import 'dart:ffi';
+
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 
 import '../data/user_preferences.dart';
 
-class AlarmEditScreen extends StatefulWidget {
-  final AlarmSettings? alarmSettings;
-  final Map<String, dynamic> settings;
-
-  const AlarmEditScreen({Key? key, this.alarmSettings, required this.settings})
-      : super(key: key);
+class SettingsScreen extends StatefulWidget {
 
   @override
-  State<AlarmEditScreen> createState() => _AlarmEditScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _AlarmEditScreenState extends State<AlarmEditScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   bool loading = false;
   Map<String, dynamic> _newSettings = {};
+  final TextEditingController _walkingDistanceController = TextEditingController();
 
   // late bool creating;
   // //late TimeOfDay selectedTime;
@@ -44,7 +42,19 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
   @override
   void initState() {
     super.initState();
-    _newSettings = widget.settings;
+    //_newSettings = widget.settings;
+    _newSettings = {
+      'unfocusDuration': UserPreferences().getUnfocusDuration(),
+      'focusDuration': UserPreferences().getFocusDuration(),
+      'requireWalking': UserPreferences().getRequireWalking(),
+      'walkingDistance': UserPreferences().getWalkingDistance(),
+      'loopAudio': UserPreferences().getLoopAudio(),
+      'vibration': UserPreferences().getVibration(),
+      'volumeMax': UserPreferences().getVolumeMax(),
+      'showNotification': UserPreferences().getShowNotification(),
+      'assetAudionPath': UserPreferences().getAssetAudionPath(),
+    };
+    _walkingDistanceController.text = _newSettings['walkingDistance'].round().toString();
     // creating = widget.alarmSettings == null;
     //
     // if (creating) {
@@ -112,12 +122,19 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
   //   return alarmSettings;
   // }
 
-  Future<void> saveSettings() async{
+  @override
+  void dispose() {
+    _walkingDistanceController.dispose();
+    super.dispose();
+  }
+
+  Future<void> saveSettings() async {
     setState(() => loading = true);
     await UserPreferences().setFocusDuration(_newSettings['focusDuration']);
     await UserPreferences().setUnfocusDuration(_newSettings['unfocusDuration']);
     await UserPreferences().setRequireWalking(_newSettings['requireWalking']);
-    await UserPreferences().setWalkingDistance(_newSettings['walkingDistance']);
+    //await UserPreferences().setWalkingDistance(_newSettings['walkingDistance']);
+    await UserPreferences().setWalkingDistance(double.parse(_walkingDistanceController.text));
     await UserPreferences().setLoopAudio(_newSettings['loopAudio']);
     await UserPreferences().setVibration(_newSettings['vibration']);
     await UserPreferences().setVolumeMax(_newSettings['volumeMax']);
@@ -126,6 +143,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
     Navigator.pop(context, true);
     setState(() => loading = false);
   }
+
   // void saveAlarm() {
   //   setState(() => loading = true);
   //   Alarm.set(alarmSettings: buildAlarmSettings()).then((res) {
@@ -154,10 +172,7 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 onPressed: () => Navigator.pop(context, false),
                 child: Text(
                   "Cancel",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.blueAccent),
                 ),
               ),
               TextButton(
@@ -165,12 +180,9 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 child: loading
                     ? const CircularProgressIndicator()
                     : Text(
-                  "Save",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
-                ),
+                        "Save",
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.blueAccent),
+                      ),
               ),
             ],
           ),
@@ -198,13 +210,40 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              SizedBox(
+                width: 250,
+                child: Text(
+                  //overflow: TextOverflow.clip,
+                  maxLines: 3,
+                  'Walking distance in steps required to unfocus',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              SizedBox(
+                width: 50,
+                height: 40,
+                child: TextField(
+
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  controller: _walkingDistanceController,
+                  // decoration: InputDecoration(
+                  //   border: OutlineInputBorder(),
+                  // ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Text(
                 'Loop alarm audio',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
                 value: _newSettings['loopAudio'],
-                onChanged: (value) => setState(() =>_newSettings['loopAudio'] = value),
+                onChanged: (value) => setState(() => _newSettings['loopAudio'] = value),
               ),
             ],
           ),
@@ -281,6 +320,10 @@ class _AlarmEditScreenState extends State<AlarmEditScreen> {
                 onChanged: (value) => setState(() => _newSettings['assetAudionPath'] = value),
               ),
             ],
+
+          ),
+          const SizedBox(
+            height: 10,
           ),
           // if (!creating)
           //   TextButton(
