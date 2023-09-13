@@ -21,20 +21,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<AlarmSettings> alarms;
 
-  static StreamSubscription? subscription;
+  static StreamSubscription? _alarmSubscription;
 
   Map<String, dynamic> _settings = {};
 
   bool isMoving = false;
   DateTime movementStartTime = DateTime.now();
-  DateTime movementEndTime = DateTime.now();
   bool loading = false;
   double _movingDuration = 0;
 
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
   List<double>? _userAccelerometerValues;
-
-
 
   late bool creating;
 
@@ -42,11 +39,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    loadAlarms();
-    subscription ??= Alarm.ringStream.stream.listen(
+    _loadAlarms();
+    _alarmSubscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
     );
-    startSensors();
+    _startSensors();
     _initAlarmSettings();
 
 
@@ -59,7 +56,7 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-  void startSensors() {
+  void _startSensors() {
     _streamSubscriptions.add(
       userAccelerometerEvents.listen(
 
@@ -106,7 +103,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    subscription?.cancel();
+    _alarmSubscription?.cancel();
     for (final subscription in _streamSubscriptions) {
       subscription.cancel();
     }
@@ -129,7 +126,7 @@ class _HomePageState extends State<HomePage> {
     creating = widget.alarmSettings == null;
   }
 
-  void loadAlarms() {
+  void _loadAlarms() {
     // AlarmStorage.unsaveAlarm(35120);
     setState(() {
       alarms = Alarm.getAlarms();
@@ -143,7 +140,7 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(
           builder: (context) => AlarmRingScreen(alarmSettings: alarmSettings),
         ));
-    loadAlarms();
+    _loadAlarms();
   }
 
   Future<void> navigateToSettingsScreen(AlarmSettings? alarmSettings) async {
@@ -160,7 +157,7 @@ class _HomePageState extends State<HomePage> {
           );
         });
 
-    if (res != null && res == true) loadAlarms();
+    if (res != null && res == true) _loadAlarms();
   }
 
 
@@ -248,24 +245,7 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text('UserAccelerometer: $userAccelerometer'),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
                       child: Text('Is moving: $isMoving'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('Movement start time: ${formatDate(movementStartTime)}'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('Movement end time: ${formatDate(movementEndTime)}'),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
