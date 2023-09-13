@@ -49,6 +49,8 @@
 	<true/>
 	<key>NSMotionUsageDescription</key>
     <string>This application tracks your steps</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    	<string>This application tracks your phone movement</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>processing</string>

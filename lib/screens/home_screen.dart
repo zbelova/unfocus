@@ -1,16 +1,13 @@
 import 'dart:async';
 
 import 'package:alarm/alarm.dart';
-import 'package:alarm/service/storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:unfocus/data/user_preferences.dart';
 import 'package:unfocus/screens/focus_screen.dart';
 import 'package:unfocus/screens/unfocus_screen.dart';
-
-import '../widgets/tile.dart';
 import 'settings_screen.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 class HomePage extends StatefulWidget {
   final AlarmSettings? alarmSettings;
@@ -26,22 +23,21 @@ class _HomePageState extends State<HomePage> {
 
   static StreamSubscription? subscription;
 
-  late Stream<StepCount> _stepCountStream;
-  late Stream<PedestrianStatus> _pedestrianStatusStream;
-  String _status = '?', _steps = '?';
   Map<String, dynamic> _settings = {};
-  //double? _unfocusDuration;
-//   late double _focusDuration;
-//   late bool _requireWalking;
-//   late double _walkingDistance;
-   late bool creating;
-//
-// // late TimeOfDay selectedTime;
-//   late bool _loopAudio;
-//   late bool _vibrate;
-//   late bool _volumeMax;
-//   late bool _showNotification;
-//   late String _assetAudio;
+
+  bool isMoving = false;
+  DateTime movementStartTime = DateTime.now();
+  DateTime movementEndTime = DateTime.now();
+  bool loading = false;
+  double _movingDuration = 0;
+
+  final _streamSubscriptions = <StreamSubscription<dynamic>>[];
+  List<double>? _userAccelerometerValues;
+
+
+
+  late bool creating;
+
 
   @override
   void initState() {
@@ -50,10 +46,73 @@ class _HomePageState extends State<HomePage> {
     subscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
     );
-
+    startSensors();
     _initAlarmSettings();
-    // initPlatformState();
+
+
   }
+  double calculateMovementTime(DateTime oldStartTime, DateTime newStartTime) {
+      Duration duration = newStartTime.difference(oldStartTime);
+      duration = duration.abs();
+      double inSeconds = duration.inMilliseconds / 1000;
+      return inSeconds;
+
+  }
+
+  void startSensors() {
+    _streamSubscriptions.add(
+      userAccelerometerEvents.listen(
+
+            (UserAccelerometerEvent event) {
+
+               bool isMovingNow = (event.x.abs() + event.y.abs() + event.z.abs()) > 0.5;
+
+              if (!isMoving && isMovingNow) {
+                // Началось движение
+                setState(() {
+                  isMoving = true;
+                  movementStartTime = DateTime.now();
+                });
+              } else if (isMoving && isMovingNow) {
+                // В процессе движения
+                DateTime movementEndTime = DateTime.now();
+                setState(() {
+                  _movingDuration += calculateMovementTime(movementStartTime, movementEndTime);
+                  movementStartTime = movementEndTime;
+                });
+              } else if (isMoving && !isMovingNow) {
+                // Движение закончилось
+                setState(() {
+                  isMoving = false;
+                });
+              }
+        },
+        onError: (e) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  title: Text("Sensor Not Found"),
+                  content: Text(
+                      "It seems that your device doesn't support Accelerometer Sensor"),
+                );
+              });
+        },
+        cancelOnError: true,
+      ),
+    );
+
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    for (final subscription in _streamSubscriptions) {
+      subscription.cancel();
+    }
+    super.dispose();
+  }
+
 
   _initAlarmSettings() {
     _settings = {
@@ -68,78 +127,6 @@ class _HomePageState extends State<HomePage> {
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
     creating = widget.alarmSettings == null;
-
-    // if (creating) {
-    //   loopAudio = true;
-    //   vibrate = true;
-    //   volumeMax = true;
-    //   showNotification = true;
-    //   assetAudio = 'assets/marimba.mp3';
-    // } else {
-    //   loopAudio = widget.alarmSettings!.loopAudio;
-    //   vibrate = widget.alarmSettings!.vibrate;
-    //   volumeMax = widget.alarmSettings!.volumeMax;
-    //   showNotification = widget.alarmSettings!.notificationTitle != null &&
-    //       widget.alarmSettings!.notificationTitle!.isNotEmpty &&
-    //       widget.alarmSettings!.notificationBody != null &&
-    //       widget.alarmSettings!.notificationBody!.isNotEmpty;
-    //   assetAudio = widget.alarmSettings!.assetAudioPath;
-    // }
-  }
-
-  // bool isToday() {
-  //   final now = DateTime.now();
-  //   final dateTime = DateTime(
-  //     now.year,
-  //     now.month,
-  //     now.day,
-  //     selectedTime.hour,
-  //     selectedTime.minute,
-  //     0,
-  //     0,
-  //   );
-  //
-  //   return now.isBefore(dateTime);
-  // }
-
-
-  void onStepCount(StepCount event) {
-    print(event);
-    setState(() {
-      _steps = event.steps.toString();
-    });
-  }
-
-  void onPedestrianStatusChanged(PedestrianStatus event) {
-    print(event);
-    setState(() {
-      _status = event.status;
-    });
-  }
-
-  void onPedestrianStatusError(error) {
-    print('onPedestrianStatusError: $error');
-    setState(() {
-      _status = 'Pedestrian Status not available';
-    });
-    print(_status);
-  }
-
-  void onStepCountError(error) {
-    print('onStepCountError: $error');
-    setState(() {
-      _steps = 'Step Count not available';
-    });
-  }
-
-  void initWalkingState() {
-    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-    _pedestrianStatusStream.listen(onPedestrianStatusChanged).onError(onPedestrianStatusError);
-
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen(onStepCount).onError(onStepCountError);
-
-    if (!mounted) return;
   }
 
   void loadAlarms() {
@@ -176,7 +163,7 @@ class _HomePageState extends State<HomePage> {
     if (res != null && res == true) loadAlarms();
   }
 
-  bool loading = false;
+
 
   void saveAlarm() {
     setState(() => loading = true);
@@ -227,14 +214,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  @override
-  void dispose() {
-    subscription?.cancel();
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
+    final userAccelerometer = _userAccelerometerValues
+        ?.map((double v) => v.toStringAsFixed(1))
+        .toList();
     return Scaffold(
       // appBar: AppBar(
       //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -249,115 +235,112 @@ class _HomePageState extends State<HomePage> {
         onPressed: () => navigateToSettingsScreen(null),
         label: const Icon(Icons.settings),
         elevation: 2.0,
-
       ),
       body: SafeArea(
-        child:
-            // const Text(
-            //   'Steps Taken',
-            //   style: TextStyle(fontSize: 30),
-            // ),
-            // Text(
-            //   _steps,
-            //   style: const TextStyle(fontSize: 60),
-            // ),
-            // const Divider(
-            //   height: 100,
-            //   thickness: 0,
-            //   color: Colors.white,
-            // ),
-            // const Text(
-            //   'Pedestrian Status',
-            //   style: TextStyle(fontSize: 30),
-            // ),
-            // Icon(
-            //   _status == 'walking'
-            //       ? Icons.directions_walk
-            //       : _status == 'stopped'
-            //           ? Icons.accessibility_new
-            //           : Icons.error,
-            //   size: 100,
-            // ),
-            // Center(
-            //   child: Text(
-            //     _status,
-            //     style: _status == 'walking' || _status == 'stopped' ? const TextStyle(fontSize: 30) : const TextStyle(fontSize: 20, color: Colors.red),
-            //   ),
-            // ),
-            Padding(
+        child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Focus: ${_settings['focusDuration'].toInt().toString()} minutes",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: CupertinoSlider(
-                    value: _settings['focusDuration'],
-                    min: 1,
-                    max: 60,
-                    onChanged: (value) {
-                      setState(() {
-                        _settings['focusDuration'] = value;
-                      });
-                      UserPreferences().setFocusDuration(value);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "Unfocus: ${_settings['unfocusDuration']!.toInt().toString()} minutes",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: CupertinoSlider(
-                    value: _settings['unfocusDuration']!,
-                    min: 1,
-                    max: 60,
-                    onChanged: (value) {
-                      setState(() {
-                        _settings['unfocusDuration'] = value;
-                      });
-                      UserPreferences().setUnfocusDuration(value);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Require walking to unfocus",
-                      style: TextStyle(
-                        fontSize: 16,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('UserAccelerometer: $userAccelerometer'),
+                        ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Is moving: $isMoving'),
                     ),
-                    Switch(
-                        value: _settings['requireWalking'],
-                        onChanged: (value) {
-                          setState(() {
-                            _settings['requireWalking'] = value;
-                          });
-                          UserPreferences().setRequireWalking(value);
-                        }),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Movement start time: ${formatDate(movementStartTime)}'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Movement end time: ${formatDate(movementEndTime)}'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Movement duration: $_movingDuration'),
+                    ),
                   ],
                 ),
+                // Text(
+                //   "Focus: ${_settings['focusDuration'].toInt().toString()} minutes",
+                //   style: TextStyle(
+                //     fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                //   ),
+                // ),
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width * 0.75,
+                //   child: CupertinoSlider(
+                //     value: _settings['focusDuration'],
+                //     min: 1,
+                //     max: 60,
+                //     onChanged: (value) {
+                //       setState(() {
+                //         _settings['focusDuration'] = value;
+                //       });
+                //       UserPreferences().setFocusDuration(value);
+                //     },
+                //   ),
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // Text(
+                //   "Unfocus: ${_settings['unfocusDuration']!.toInt().toString()} minutes",
+                //   style: TextStyle(
+                //     fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                //   ),
+                // ),
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width * 0.75,
+                //   child: CupertinoSlider(
+                //     value: _settings['unfocusDuration']!,
+                //     min: 1,
+                //     max: 60,
+                //     onChanged: (value) {
+                //       setState(() {
+                //         _settings['unfocusDuration'] = value;
+                //       });
+                //       UserPreferences().setUnfocusDuration(value);
+                //     },
+                //   ),
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     const Text(
+                //       "Require walking to unfocus",
+                //       style: TextStyle(
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //     const SizedBox(
+                //       width: 10,
+                //     ),
+                //     Switch(
+                //         value: _settings['requireWalking'],
+                //         onChanged: (value) {
+                //           setState(() {
+                //             _settings['requireWalking'] = value;
+                //           });
+                //           UserPreferences().setRequireWalking(value);
+                //         }),
+                //   ],
+                // ),
                 const SizedBox(
                   height: 40,
                 ),

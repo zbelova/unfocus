@@ -15,7 +15,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - pedometer (0.0.1):
+  - sensors_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -34,7 +34,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - pedometer (from `.symlinks/plugins/pedometer/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - vibration (from `.symlinks/plugins/vibration/ios`)
   - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
@@ -56,8 +56,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/just_audio/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
-  pedometer:
-    :path: ".symlinks/plugins/pedometer/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   vibration:
@@ -74,7 +74,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  pedometer: 381969883680ade42559782cc41a3bbd453d8234
+  sensors_plus: bda64198ccc7d3ccbb49e6ae17d92f67687bee20
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   vibration: 7d883d141656a1c1a6d8d238616b2042a51a1241
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
