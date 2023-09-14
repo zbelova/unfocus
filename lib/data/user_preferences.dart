@@ -30,9 +30,9 @@ class UserPreferences {
 
   Future setRequireWalking(bool reqireWalkings) async => await _preferences?.setBool('requireWalking', reqireWalkings);
 
-  double getWalkingDistance()  => _preferences?.getDouble('walkingDistance') ?? 5;
+  double getWalkingDuration()  => _preferences?.getDouble('walkingDuration') ?? 5;
 
-  Future setWalkingDistance(double walkingDistance) async => await _preferences?.setDouble('walkingDistance', walkingDistance);
+  Future setWalkingDuration(double walkingDuration) async => await _preferences?.setDouble('walkingDuration', walkingDuration);
 
   bool getLoopAudio()  => _preferences?.getBool('loopAudio') ?? true;
 

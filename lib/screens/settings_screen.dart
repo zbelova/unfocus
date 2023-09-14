@@ -12,7 +12,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool loading = false;
   Map<String, dynamic> _newSettings = {};
-  final TextEditingController _walkingDistanceController = TextEditingController();
+  final TextEditingController _walkingDurationController = TextEditingController();
 
   @override
   void initState() {
@@ -21,20 +21,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'unfocusDuration': UserPreferences().getUnfocusDuration(),
       'focusDuration': UserPreferences().getFocusDuration(),
       'requireWalking': UserPreferences().getRequireWalking(),
-      'walkingDistance': UserPreferences().getWalkingDistance(),
+      'walkingDuration': UserPreferences().getWalkingDuration(),
       'loopAudio': UserPreferences().getLoopAudio(),
       'vibration': UserPreferences().getVibration(),
       'volumeMax': UserPreferences().getVolumeMax(),
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    _walkingDistanceController.text = _newSettings['walkingDistance'].round().toString();
+    _walkingDurationController.text = _newSettings['walkingDuration'].round().toString();
   }
 
 
   @override
   void dispose() {
-    _walkingDistanceController.dispose();
+    _walkingDurationController.dispose();
     super.dispose();
   }
 
@@ -44,7 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await UserPreferences().setUnfocusDuration(_newSettings['unfocusDuration']);
     await UserPreferences().setRequireWalking(_newSettings['requireWalking']);
     //await UserPreferences().setWalkingDistance(_newSettings['walkingDistance']);
-    await UserPreferences().setWalkingDistance(double.parse(_walkingDistanceController.text));
+    await UserPreferences().setWalkingDuration(double.parse(_walkingDurationController.text));
     await UserPreferences().setLoopAudio(_newSettings['loopAudio']);
     await UserPreferences().setVibration(_newSettings['vibration']);
     await UserPreferences().setVolumeMax(_newSettings['volumeMax']);
@@ -90,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Text(
                   //overflow: TextOverflow.clip,
                   maxLines: 3,
-                  'Walking distance in steps required to unfocus',
+                  'Walking duration in seconds required to unfocus',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
@@ -100,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: TextField(
                   textAlign: TextAlign.center,
                   keyboardType: TextInputType.number,
-                  controller: _walkingDistanceController,
+                  controller: _walkingDurationController,
                 ),
               ),
             ],
