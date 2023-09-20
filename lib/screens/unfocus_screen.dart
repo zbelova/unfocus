@@ -42,7 +42,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
-    //_addNotification();
 
     setState(() {
       _unfocusRunning = true;

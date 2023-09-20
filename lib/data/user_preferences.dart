@@ -50,7 +50,7 @@ class UserPreferences {
 
   Future setShowNotification(bool showNotification) async => await _preferences?.setBool('showNotification', showNotification);
 
-  String getAssetAudionPath() => _preferences?.getString('assetAudionPath') ?? 'assets/marimba.mp3';
+  String getAssetAudionPath() => _preferences?.getString('assetAudionPath') ?? 'assets/trapsoul.mp3';
 
   Future setAssetAudionPath(String assetAudionPath) async => await _preferences?.setString('assetAudionPath', assetAudionPath);
 }
