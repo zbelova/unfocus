@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:unfocus/screens/focus_screen.dart';
 import 'package:unfocus/screens/home_screen.dart';
 
 import '../data/user_preferences.dart';
-import '../globals.dart';
+import '../helpers/globals.dart';
+import '../helpers/notifications.dart';
 
 class AlarmRingScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
@@ -35,9 +37,13 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   bool _movingComplete = false;
   bool musicTurnedOff = false;
 
+  late final NotificationService notificationService;
+
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
+    //_addNotification();
+
     setState(() {
       _unfocusRunning = true;
     });
@@ -58,6 +64,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   }
 
   void _setNewAlarm() {
+    notificationService.showImmediateNotification();
     final now = DateTime.now();
     Alarm.stopAll();
     Alarm.set(
@@ -128,6 +135,11 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     );
   }
 
+  void _addNotification() {
+    notificationService.showFocusNotification(5);
+
+  }
+
   @override
   void initState() {
     super.initState();
@@ -157,6 +169,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       // _startTimer();
     }
     _startSensors();
+    notificationService = NotificationService();
+    notificationService.initializePlatformNotifications();
   }
 
   @override

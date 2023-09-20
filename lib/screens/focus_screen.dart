@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 
-import '../globals.dart';
+import '../helpers/globals.dart';
 import 'home_screen.dart';
 
 class FocusScreen extends StatefulWidget {

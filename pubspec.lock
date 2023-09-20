@@ -5,10 +5,10 @@ packages:
     dependency: "direct main"
     description:
       name: alarm
-      sha256: "63ed7316c356f5d5bd98ce85f527103cf054a843913fe516f5f756fd60b677bc"
+      sha256: "4ec79ba7032cc1a70db66ece2653867a3b39262fd350a252bf5aed1c5b97d67e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.2"
   android_alarm_manager_plus:
     dependency: transitive
     description:
@@ -146,10 +146,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_fgbg
-      sha256: d37511eef6afb7e2e3f2278ec6498bb12c650ed517c81bcd09452d910e8b9174
+      sha256: "08c4d2fd229e3df26083d5aecc3dea9ff4f2d188f8cd57aaf2b3f047bd08a047"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.2"
+    version: "0.3.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -159,13 +159,13 @@ packages:
     source: hosted
     version: "2.0.2"
   flutter_local_notifications:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_local_notifications
-      sha256: aea96b3b78556c97607d9bee59fcec515bc3ec1b6e905f14d72906ae055033fa
+      sha256: "3002092e5b8ce2f86c3361422e52e6db6776c23ee21e0b2f71b892bf4259ef04"
       url: "https://pub.dev"
     source: hosted
-    version: "14.1.2"
+    version: "15.1.1"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -182,6 +182,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0+1"
+  flutter_native_timezone:
+    dependency: "direct main"
+    description:
+      name: flutter_native_timezone
+      sha256: ed7bfb982f036243de1c068e269182a877100c994f05143c8b26a325e28c1b02
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -192,6 +200,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.7"
   just_audio:
     dependency: transitive
     description:
@@ -462,7 +478,7 @@ packages:
     source: hosted
     version: "0.6.0"
   timezone:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: timezone
       sha256: "1cfd8ddc2d1cfd836bc93e67b9be88c3adaeca6f40a00ca999104c30693cdca0"
