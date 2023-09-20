@@ -135,11 +135,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     );
   }
 
-  void _addNotification() {
-    notificationService.showFocusNotification(5);
-
-  }
-
   @override
   void initState() {
     super.initState();
