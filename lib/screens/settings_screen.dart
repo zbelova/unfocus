@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:audioplayers/audioplayers.dart';
 import '../data/user_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
-
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
@@ -12,6 +11,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool loading = false;
   Map<String, dynamic> _newSettings = {};
   final TextEditingController _walkingDurationController = TextEditingController();
+
+  AudioPlayer audioPlayer = AudioPlayer();
 
   final List _music = [
     [
@@ -39,7 +40,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    //UserPreferences().setAssetAudionPath('assets/trapsoul.mp3');
     _newSettings = {
       'unfocusDuration': UserPreferences().getUnfocusDuration(),
       'focusDuration': UserPreferences().getFocusDuration(),
@@ -54,7 +54,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _walkingDurationController.text = _newSettings['walkingDuration'].round().toString();
   }
 
-
   @override
   void dispose() {
     _walkingDurationController.dispose();
@@ -62,11 +61,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> saveSettings() async {
+    stopAudio();
     setState(() => loading = true);
     await UserPreferences().setFocusDuration(_newSettings['focusDuration']);
     await UserPreferences().setUnfocusDuration(_newSettings['unfocusDuration']);
     await UserPreferences().setRequireWalking(_newSettings['requireWalking']);
-    //await UserPreferences().setWalkingDistance(_newSettings['walkingDistance']);
     await UserPreferences().setWalkingDuration(double.parse(_walkingDurationController.text));
     await UserPreferences().setLoopAudio(_newSettings['loopAudio']);
     await UserPreferences().setVibration(_newSettings['vibration']);
@@ -75,6 +74,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await UserPreferences().setAssetAudionPath(_newSettings['assetAudionPath']);
     Navigator.pop(context, true);
     setState(() => loading = false);
+  }
+
+  void playAudio() async {
+    String fileName = _newSettings['assetAudionPath'].split('/').last;
+    audioPlayer.play(
+      AssetSource(fileName),
+      volume: 1,
+    );
+  }
+
+  void stopAudio() async {
+    audioPlayer.stop();
   }
 
   @override
@@ -88,14 +99,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
+                onPressed: () {
+                  stopAudio();
+                  Navigator.pop(context, false);
+                },
                 child: Text(
                   "Cancel",
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.blueAccent),
                 ),
               ),
               TextButton(
@@ -103,13 +113,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: loading
                     ? const CircularProgressIndicator()
                     : Text(
-                  "Save",
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(color: Colors.blueAccent),
-                ),
+                        "Save",
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.blueAccent),
+                      ),
               ),
             ],
           ),
@@ -122,10 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //overflow: TextOverflow.clip,
                   maxLines: 3,
                   'Walking duration in seconds required to unfocus',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .titleMedium,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               SizedBox(
@@ -144,10 +147,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 'Loop alarm audio',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
                 value: _newSettings['loopAudio'],
@@ -160,10 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 'Vibrate',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
                 value: _newSettings['vibration'],
@@ -176,10 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 'System volume max',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
                 value: _newSettings['volumeMax'],
@@ -192,10 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 'Show notification',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
                 value: _newSettings['showNotification'],
@@ -208,24 +199,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 'Sound',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .titleMedium,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
+              IconButton(onPressed: playAudio, icon: Icon(Icons.play_arrow)),
+              IconButton(onPressed: stopAudio, icon: Icon(Icons.stop)),
               DropdownButton(
                 value: _newSettings['assetAudionPath'],
-                onTap: () {},
-                items: _music.map((e) =>
-                    DropdownMenuItem(
-                      value: e[1],
-                      child: Text(e[0]),
-                    )).toList(),
-
+                //onTap: () {},
+                items: _music
+                    .map((e) => DropdownMenuItem(
+                          value: e[1],
+                          child: Text(e[0]),
+                        ))
+                    .toList(),
                 onChanged: (value) => setState(() => _newSettings['assetAudionPath'] = value),
               ),
             ],
-
           ),
           const SizedBox(
             height: 10,

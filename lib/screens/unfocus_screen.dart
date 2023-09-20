@@ -63,7 +63,9 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   }
 
   void _setNewAlarm() {
-    notificationService.showImmediateNotification();
+    if(_settings['showNotification']) {
+      notificationService.showImmediateNotification();
+    }
     final now = DateTime.now();
     Alarm.stopAll();
     Alarm.set(
@@ -210,6 +212,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                       setState(() {
                         _showTimer = true;
                         _unfocusRunning = true;
+                        _movingComplete = true;
                       });
                       _startTimer();
                     },
@@ -221,6 +224,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                       setState(() {
                         _showTimer = true;
                         _unfocusRunning = true;
+                        _movingComplete = true;
                       });
                       _startTimer();
                     },

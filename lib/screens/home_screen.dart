@@ -93,6 +93,17 @@ class _HomePageState extends State<HomePage> {
 
   void saveAlarm() {
     setState(() => loading = true);
+    _settings = {
+      'unfocusDuration': UserPreferences().getUnfocusDuration(),
+      'focusDuration': UserPreferences().getFocusDuration(),
+      'requireWalking': UserPreferences().getRequireWalking(),
+      'walkingDuration': UserPreferences().getWalkingDuration(),
+      'loopAudio': UserPreferences().getLoopAudio(),
+      'vibration': UserPreferences().getVibration(),
+      'volumeMax': UserPreferences().getVolumeMax(),
+      'showNotification': UserPreferences().getShowNotification(),
+      'assetAudionPath': UserPreferences().getAssetAudionPath(),
+    };
     final alarmSettings = buildAlarmSettings();
     Alarm.set(alarmSettings: alarmSettings).then((res) {
       if (res) {
@@ -136,17 +147,7 @@ class _HomePageState extends State<HomePage> {
       notificationBody: _settings['showNotification'] ? 'Time to unfocus' : null,
       assetAudioPath: _settings['assetAudionPath'],
       stopOnNotificationOpen: false,
-    );
-    AlarmSettings(
-      id: id,
-      dateTime: dateTime,
-      // loopAudio: _settings['loopAudio'],
-      vibrate: _settings['vibration'],
-      //volumeMax: _settings['volumeMax'],
-      notificationTitle: _settings['showNotification'] ? 'Unfocus!' : null,
-      notificationBody: _settings['showNotification'] ? 'Time to unfocus' : null,
-      assetAudioPath: _settings['assetAudionPath'],
-      stopOnNotificationOpen: false,
+
     );
     return alarmSettings;
   }
