@@ -30,7 +30,7 @@ class UserPreferences {
 
   Future setRequireWalking(bool reqireWalkings) async => await _preferences?.setBool('requireWalking', reqireWalkings);
 
-  double getWalkingDuration()  => _preferences?.getDouble('walkingDuration') ?? 5;
+  double getWalkingDuration()  => _preferences?.getDouble('walkingDuration') ?? 10;
 
   Future setWalkingDuration(double walkingDuration) async => await _preferences?.setDouble('walkingDuration', walkingDuration);
 

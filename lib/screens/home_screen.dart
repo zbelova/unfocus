@@ -58,7 +58,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadAlarms() {
-    // AlarmStorage.unsaveAlarm(35120);
     setState(() {
       alarms = Alarm.getAlarms();
       alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
       now.minute,
       now.second,
       now.millisecond,
-    ).add(const Duration(seconds: 8));
+    ).add(Duration(seconds: _settings['focusDuration'].round() * 60));
     if (dateTime.isBefore(DateTime.now())) {
       dateTime = dateTime.add(const Duration(days: 1));
     }

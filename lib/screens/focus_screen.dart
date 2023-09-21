@@ -1,8 +1,7 @@
 import 'dart:async';
-
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
-
+import 'package:unfocus/data/user_preferences.dart';
 import '../helpers/globals.dart';
 import 'home_screen.dart';
 
@@ -18,7 +17,7 @@ class FocusScreen extends StatefulWidget {
 class _FocusScreenState extends State<FocusScreen> {
   Timer? _timer;
   bool _focusRunning = false;
-  int _current = 0;
+  int _current = UserPreferences().getFocusDuration().round() * 60;
 
   void _startTimer() {
     setState(() {
@@ -60,7 +59,7 @@ class _FocusScreenState extends State<FocusScreen> {
   @override
   void initState() {
     super.initState();
-    _current = 8;
+    //_current = UserPreferences().getFocusDuration().round() * 60;
     _startTimer();
   }
 

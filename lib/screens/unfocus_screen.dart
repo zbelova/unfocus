@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:unfocus/screens/focus_screen.dart';
 import 'package:unfocus/screens/home_screen.dart';
@@ -27,8 +26,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   bool _unfocusRunning = false;
   bool _showTimer = false;
   bool _walkingRequired = false;
-
-  //String _unfocusText = 'Unfocus';
   bool _buttonDelayed = false;
 
   bool _isMoving = false;
@@ -76,8 +73,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           now.minute,
           now.second,
           now.millisecond,
-          //).add(Duration(minutes: _settings['focusDuration'].round())),
-        ).add(const Duration(seconds: 10)),
+          ).add(Duration(minutes: _settings['focusDuration'].round())),
+        //.add(const Duration(seconds: 10)),
       ),
     ).then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FocusScreen(alarmSettings: widget.alarmSettings))));
   }
@@ -148,7 +145,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    _current = 15;
+    _current = _settings['unfocusDuration'].round() * 60;
     _walkingRequired = _settings['requireWalking'];
     if (_walkingRequired) {
       _buttonDelayed = true;
@@ -157,9 +154,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           _buttonDelayed = false;
         });
       });
-    } else {
-      // _showTimer = true;
-      // _startTimer();
     }
     _startSensors();
     notificationService = NotificationService();
@@ -180,10 +174,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          // image: DecorationImage(
-          //   image: AssetImage('assets/images/4.jpg'),
-          //   fit: BoxFit.cover,
-          // ),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -216,7 +206,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                   ),
                 ),
                 if (!_showTimer && !_walkingRequired) _buildUnfocusButton(),
-                if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
+               // if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
                 _buildTimer(),
                 _buildDontWantToWalk(),
                 if (_showTimer) _buildPauseStop(context),
@@ -257,26 +247,31 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   SizedBox _buildTimer() {
     return SizedBox(
         height: 250,
-        child: (_showTimer)
-            ? Text(
-                formatSecondsToMinutes(_current),
-                style: const TextStyle(
-                  fontSize: 40,
-                  color: Color(0xFF484848),
-                ),
-              )
-            : Container());
+        child:
+             Column(
+              children: [
+               if (_showTimer) Text(
+                    formatSecondsToMinutes(_current),
+                    style: const TextStyle(
+                      fontSize: 40,
+                      color: Color(0xFF484848),
+                    ),
+                  ),
+                if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress()
+              ],),
+            );
+
   }
 
   Padding _buildProgress() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
       child: LinearProgressIndicator(
         value: _movingDuration / _settings['walkingDuration'],
         minHeight: 25,
         borderRadius: BorderRadius.circular(10),
-        backgroundColor: Color(0xFFC6FAFF),
-        color: Color(0xFF01AADA),
+        backgroundColor: const Color(0xFFC6FAFF),
+        color: const Color(0xFF01AADA),
       ),
     );
   }
@@ -372,7 +367,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           ),
         ),
         const SizedBox(
-          height: 60,
+          height: 40,
         ),
         Container(
           height: 130,
