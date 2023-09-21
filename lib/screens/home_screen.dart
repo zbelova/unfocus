@@ -29,6 +29,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+   // FlutterNativeSplash.remove();
     _loadAlarms();
     _alarmSubscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
@@ -65,11 +67,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AlarmRingScreen(alarmSettings: alarmSettings),
-        ));
+    print(alarmSettings.notificationTitle);
+    if(alarmSettings.notificationTitle=='Unfocus!') {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UnfocusScreen(alarmSettings: alarmSettings),
+          ));
+    }
+    else{
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FocusScreen(alarmSettings: alarmSettings),
+          ));
+    }
     _loadAlarms();
   }
 
@@ -122,7 +134,6 @@ class _HomePageState extends State<HomePage> {
   AlarmSettings buildAlarmSettings() {
     final now = DateTime.now();
     final id = creating ? DateTime.now().millisecondsSinceEpoch % 100000 : widget.alarmSettings!.id;
-
     DateTime dateTime = DateTime(
       now.year,
       now.month,
@@ -131,7 +142,9 @@ class _HomePageState extends State<HomePage> {
       now.minute,
       now.second,
       now.millisecond,
-    ).add(Duration(seconds: _settings['focusDuration'].round() * 60));
+   // ).add(Duration(seconds: _settings['focusDuration'].floor() * 60));
+      //TODO убрать на настоящие
+    ).add(Duration(seconds: 10));
     if (dateTime.isBefore(DateTime.now())) {
       dateTime = dateTime.add(const Duration(days: 1));
     }
@@ -143,7 +156,7 @@ class _HomePageState extends State<HomePage> {
       vibrate: _settings['vibration'],
       volumeMax: _settings['volumeMax'],
       notificationTitle: _settings['showNotification'] ? 'Unfocus!' : null,
-      notificationBody: _settings['showNotification'] ? 'Time to unfocus' : null,
+      notificationBody: _settings['showNotification'] ? 'Take a break' : null,
       assetAudioPath: _settings['assetAudionPath'],
       stopOnNotificationOpen: false,
 
@@ -187,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoSlider(
                       value: _settings['focusDuration'],
                       min: 1,
@@ -211,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.75,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoSlider(
                       value: _settings['unfocusDuration']!,
                       min: 1,
@@ -235,6 +248,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(

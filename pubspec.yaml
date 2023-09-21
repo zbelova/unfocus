@@ -41,12 +41,11 @@ dependencies:
   timezone: ^0.9.2
   flutter_native_timezone: ^2.0.0
   audioplayers: ^5.1.0
-
-
+  flutter_native_splash: ^2.3.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.3.2
+
   flutter_test:
     sdk: flutter
 
@@ -62,7 +61,9 @@ flutter_launcher_icons:
   # rules and activating additional ones.
 flutter_native_splash:
   color: "#8aaad8"
-
+  #background_image: "assets/images/background.png"
+  android: true
+  ios: true
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the

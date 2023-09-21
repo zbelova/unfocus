@@ -10,19 +10,19 @@ import '../data/user_preferences.dart';
 import '../helpers/globals.dart';
 import '../helpers/notifications.dart';
 
-class AlarmRingScreen extends StatefulWidget {
+class UnfocusScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
 
-  const AlarmRingScreen({Key? key, required this.alarmSettings}) : super(key: key);
+  const UnfocusScreen({Key? key, required this.alarmSettings}) : super(key: key);
 
   @override
-  State<AlarmRingScreen> createState() => _AlarmRingScreenState();
+  State<UnfocusScreen> createState() => _UnfocusScreenState();
 }
 
-class _AlarmRingScreenState extends State<AlarmRingScreen> {
+class _UnfocusScreenState extends State<UnfocusScreen> {
   Map<String, dynamic> _settings = {};
   Timer? _timer;
-  int _current = 0;
+  int _current = UserPreferences().getUnfocusDuration().floor() * 60;
   bool _unfocusRunning = false;
   bool _showTimer = false;
   bool _walkingRequired = false;
@@ -40,6 +40,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
+    Alarm.stopAll();
+    _setFocusAlarm();
     setState(() {
       _unfocusRunning = true;
     });
@@ -49,7 +51,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       (Timer timer) => setState(() {
         if (_current <= 0) {
           timer.cancel();
-          _setNewAlarm();
         } else {
           _current--;
         }
@@ -57,14 +58,14 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     );
   }
 
-  void _setNewAlarm() {
-    if (_settings['showNotification']) {
-      notificationService.showImmediateNotification();
-    }
+  void _setFocusAlarm() {
     final now = DateTime.now();
     Alarm.stopAll();
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
+        notificationTitle: 'Focus!',
+        notificationBody: 'Keep focused on your goals',
+        assetAudioPath: 'assets/1-second-of-silence.mp3',
         dateTime: DateTime(
           now.year,
           now.month,
@@ -73,10 +74,11 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           now.minute,
           now.second,
           now.millisecond,
-          ).add(Duration(minutes: _settings['focusDuration'].round())),
-        //.add(const Duration(seconds: 10)),
+        ).add(Duration(seconds: _current)),
+          //TODO убрать на настоящие
+        //).add(const Duration(seconds: 10)),
       ),
-    ).then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FocusScreen(alarmSettings: widget.alarmSettings))));
+    );
   }
 
   double _calculateMovementTime(DateTime oldStartTime, DateTime newStartTime) {
@@ -145,7 +147,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    _current = _settings['unfocusDuration'].round() * 60;
+    //_current = _settings['unfocusDuration'].floor() * 60;
     _walkingRequired = _settings['requireWalking'];
     if (_walkingRequired) {
       _buttonDelayed = true;
@@ -156,8 +158,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       });
     }
     _startSensors();
-    notificationService = NotificationService();
-    notificationService.initializePlatformNotifications();
   }
 
   @override
@@ -206,7 +206,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                   ),
                 ),
                 if (!_showTimer && !_walkingRequired) _buildUnfocusButton(),
-               // if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
+                // if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
                 _buildTimer(),
                 _buildDontWantToWalk(),
                 if (_showTimer) _buildPauseStop(context),
@@ -246,21 +246,36 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
 
   SizedBox _buildTimer() {
     return SizedBox(
-        height: 250,
-        child:
-             Column(
-              children: [
-               if (_showTimer) Text(
-                    formatSecondsToMinutes(_current),
-                    style: const TextStyle(
-                      fontSize: 40,
-                      color: Color(0xFF484848),
+      height: 250,
+      child: Column(
+        children: [
+          if (_showTimer)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFF83F0FF),
+              ),
+              child: SizedBox(
+                width: 160,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      formatSecondsToMinutes(_current),
+                      style: const TextStyle(
+                        fontSize: 40,
+                        color: Color(0xFF484848),
+                      ),
                     ),
                   ),
-                if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress()
-              ],),
-            );
-
+                ),
+              ),
+            ),
+          if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress()
+        ],
+      ),
+    );
   }
 
   Padding _buildProgress() {
@@ -280,7 +295,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
         onPressed: () {
-          Alarm.stopAll();
+          //Alarm.stopAll();
           setState(() {
             _showTimer = true;
             _unfocusRunning = true;
@@ -288,6 +303,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
             _walkingRequired = false;
             _showUnfocusText = true;
           });
+          //_setFocusAlarm();
           _startTimer();
         },
         child: const Text("Unfocus", style: TextStyle(color: Color(0xFF0387B0), fontSize: 20, height: 4)));
@@ -394,6 +410,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
+                  Alarm.stopAll();
                   setState(() {
                     _unfocusRunning = false;
                   });
@@ -402,7 +419,10 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                 iconSize: 40,
               )
             : IconButton(
-                onPressed: _startTimer,
+                onPressed: () {
+                  _startTimer();
+                  //_setFocusAlarm();
+                },
                 icon: const Icon(Icons.play_arrow_rounded),
                 iconSize: 40,
               ),

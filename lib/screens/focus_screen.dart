@@ -17,9 +17,11 @@ class FocusScreen extends StatefulWidget {
 class _FocusScreenState extends State<FocusScreen> {
   Timer? _timer;
   bool _focusRunning = false;
-  int _current = UserPreferences().getFocusDuration().round() * 60;
+  int _current = UserPreferences().getFocusDuration().floor() * 60;
 
   void _startTimer() {
+    Alarm.stopAll();
+    _setUnfocusAlarm();
     setState(() {
       _focusRunning = true;
     });
@@ -30,7 +32,6 @@ class _FocusScreenState extends State<FocusScreen> {
       (Timer timer) => setState(() {
         if (_current <= 0) {
           timer.cancel();
-          //_setNewAlarm();
         } else {
           _current--;
         }
@@ -38,10 +39,13 @@ class _FocusScreenState extends State<FocusScreen> {
     );
   }
 
-  void _setNewAlarm() {
+  void _setUnfocusAlarm() {
     final now = DateTime.now();
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
+        notificationTitle: 'Unfocus!',
+        notificationBody: 'Take a break',
+        assetAudioPath: UserPreferences().getAssetAudionPath(),
         dateTime: DateTime(
           now.year,
           now.month,
@@ -50,8 +54,9 @@ class _FocusScreenState extends State<FocusScreen> {
           now.minute,
           now.second,
           now.millisecond,
-          //).add(Duration(minutes: _settings['focusDuration'].round())),
         ).add(Duration(seconds: _current)),
+          //TODO убрать на настоящие
+        //).add(Duration(seconds: 10)),
       ),
     );
   }
@@ -59,7 +64,7 @@ class _FocusScreenState extends State<FocusScreen> {
   @override
   void initState() {
     super.initState();
-    //_current = UserPreferences().getFocusDuration().round() * 60;
+
     _startTimer();
   }
 
@@ -99,11 +104,32 @@ class _FocusScreenState extends State<FocusScreen> {
                 ),
                 SizedBox(
                   height: 250,
-                  child: Text(
-                    formatSecondsToMinutes(_current),
-                    style: const TextStyle(
-                      fontSize: 40,
-                      color: Color(0xFF565656),
+                  child: Center(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFECD1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: SizedBox(
+                          width: 160,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                formatSecondsToMinutes(_current),
+                                style: const TextStyle(
+                                  fontSize: 40,
+                                  color: Color(0xFF565656),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -124,9 +150,9 @@ class _FocusScreenState extends State<FocusScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
+                  Alarm.stopAll();
                   setState(() {
                     _focusRunning = false;
-                    Alarm.stopAll();
                   });
                 },
                 icon: const Icon(Icons.motion_photos_paused_outlined),
@@ -135,7 +161,7 @@ class _FocusScreenState extends State<FocusScreen> {
             : IconButton(
                 onPressed: () {
                   _startTimer();
-                  _setNewAlarm();
+                  // _setUnfocusAlarm();
                 },
                 icon: const Icon(Icons.play_arrow_rounded),
                 iconSize: 40,

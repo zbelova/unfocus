@@ -3,12 +3,16 @@ import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:unfocus/screens/home_screen.dart';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'data/user_preferences.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // await Future.delayed(const Duration(milliseconds: 3000), () {});
+  FlutterNativeSplash.remove();
+
   await UserPreferences().init();
   await Alarm.init(showDebugLogs: true);
   runApp(const MyApp());
@@ -21,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Unfocus',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple,),
 
@@ -29,6 +33,8 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
+      //home: Test()
     );
   }
 }
+
