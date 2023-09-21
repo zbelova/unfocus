@@ -64,7 +64,6 @@ class _FocusScreenState extends State<FocusScreen> {
     _startTimer();
   }
 
-
   @override
   void dispose() {
     if (_timer != null) _timer!.cancel();
@@ -73,52 +72,77 @@ class _FocusScreenState extends State<FocusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.inversePrimary,
-      child: SafeArea(
-        child: Scaffold(
-          body: Center(
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/6.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text('Focus'),
-                Text(
-                  formatSecondsToMinutes(_current),
-                  style: const TextStyle(fontSize: 30),
-                ),
-                _focusRunning
-                    ? ElevatedButton(
-                      onPressed: () {
-                        if (_timer != null) _timer!.cancel();
-                        setState(() {
-                          _focusRunning = false;
-                          Alarm.stopAll();
-                        });
-                      },
-                      child: Text(
-                        "Pause",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    )
-                    : ElevatedButton(
-                      onPressed: () {
-                        _startTimer();
-                        _setNewAlarm();
-                      },
-                      child: Text(
-                        "Resume",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_timer != null) _timer!.cancel();
-                    Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
-                  },
-                  child: Text(
-                    "Stop",
-                    style: Theme.of(context).textTheme.titleLarge,
+                const Text(
+                  'Focus',
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: Color(0xFF565656),
                   ),
                 ),
+                Text(
+                  formatSecondsToMinutes(_current),
+                  style: const TextStyle(
+                    fontSize: 40,
+                    color: Color(0xFF565656),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _focusRunning
+                        ? IconButton(
+                            onPressed: () {
+                              if (_timer != null) _timer!.cancel();
+                              setState(() {
+                                _focusRunning = false;
+                                Alarm.stopAll();
+                              });
+                            },
+                            icon: const Icon(Icons.motion_photos_paused_outlined),
+                            iconSize: 40,
+                          )
+                        : IconButton(
+                            onPressed: () {
+                              _startTimer();
+                              _setNewAlarm();
+                            },
+                            icon: const Icon(Icons.play_arrow_rounded),
+                            iconSize: 40,
+                          ),
+
+                    IconButton(
+                      onPressed: () {
+                        if (_timer != null) _timer!.cancel();
+                        Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
+                      },
+                      icon: const Icon(Icons.stop_rounded),
+                      iconSize: 40,
+                    ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     if (_timer != null) _timer!.cancel();
+                    //     Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
+                    //   },
+                    //   child: Text(
+                    //     "Stop",
+                    //     style: Theme.of(context).textTheme.titleLarge,
+                    //   ),
+                    // ),
+                  ],
+                )
               ],
             ),
           ),

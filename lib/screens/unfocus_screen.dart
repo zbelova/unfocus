@@ -31,23 +31,21 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   //String _unfocusText = 'Unfocus';
   bool _buttonDelayed = false;
 
-  bool isMoving = false;
-  DateTime movementStartTime = DateTime.now();
+  bool _isMoving = false;
+  DateTime _movementStartTime = DateTime.now();
   double _movingDuration = 0;
   bool _movingComplete = false;
-  bool musicTurnedOff = false;
+  bool _musicTurnedOff = false;
+  bool _showUnfocusText = false;
 
   late final NotificationService notificationService;
 
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
-
     setState(() {
       _unfocusRunning = true;
     });
-
-    //var duration = Duration(minutes: 1);
     var duration = const Duration(seconds: 1);
     _timer = Timer.periodic(
       duration,
@@ -96,29 +94,29 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       (UserAccelerometerEvent event) {
         bool isMovingNow = (event.x.abs() + event.y.abs() + event.z.abs()) > 0.5;
 
-        if (!isMoving && isMovingNow) {
+        if (!_isMoving && isMovingNow) {
           // Началось движение
           setState(() {
-            isMoving = true;
-            movementStartTime = DateTime.now();
+            _isMoving = true;
+            _movementStartTime = DateTime.now();
           });
-        } else if (isMoving && isMovingNow) {
+        } else if (_isMoving && isMovingNow) {
           // В процессе движения
           DateTime movementEndTime = DateTime.now();
           setState(() {
-            _movingDuration += _calculateMovementTime(movementStartTime, movementEndTime);
+            _movingDuration += _calculateMovementTime(_movementStartTime, movementEndTime);
             if (_movingDuration > _settings['walkingDuration']) {
               _movingComplete = true;
               _showTimer = true;
               _startTimer();
               _accelerometerEventsSubscription!.cancel();
             }
-            movementStartTime = movementEndTime;
+            _movementStartTime = movementEndTime;
           });
-        } else if (isMoving && !isMovingNow) {
+        } else if (_isMoving && !isMovingNow) {
           // Движение закончилось
           setState(() {
-            isMoving = false;
+            _isMoving = false;
           });
         }
       },
@@ -193,18 +191,19 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                   children: [
                     const Text('Great job!'),
                     const Text('Now you can relax or continue walking'),
-                    if (!musicTurnedOff)
+                    if (!_musicTurnedOff)
                       ElevatedButton(
                         onPressed: () {
                           Alarm.stopAll();
                           setState(() {
-                            musicTurnedOff = true;
+                            _musicTurnedOff = true;
                           });
                         },
                         child: const Text('Turn off the music'),
                       ),
                   ],
                 ),
+              if(_showUnfocusText) const Text('Time to unfocus and relax'),
               if (!_showTimer && !_buttonDelayed && _walkingRequired)
                 ElevatedButton(
                     onPressed: () {
@@ -213,10 +212,11 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                         _showTimer = true;
                         _unfocusRunning = true;
                         _movingComplete = true;
+                        // _showUnfocusText = true;
                       });
                       _startTimer();
                     },
-                    child: Text("I don't want to walk :(")),
+                    child: const Text("I don't want to walk :(")),
               if (!_showTimer && !_walkingRequired)
                 ElevatedButton(
                     onPressed: () {
@@ -225,6 +225,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
                         _showTimer = true;
                         _unfocusRunning = true;
                         _movingComplete = true;
+                        _walkingRequired = false;
+                        _showUnfocusText = true;
                       });
                       _startTimer();
                     },

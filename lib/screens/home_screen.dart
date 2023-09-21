@@ -163,103 +163,117 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => navigateToSettingsScreen(null),
-        label: const Icon(Icons.settings),
-        elevation: 2.0,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Focus: ${_settings['focusDuration'].toInt().toString()} minutes",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: CupertinoSlider(
-                    value: _settings['focusDuration'],
-                    min: 1,
-                    max: 60,
-                    onChanged: (value) {
-                      setState(() {
-                        _settings['focusDuration'] = value;
-                      });
-                      UserPreferences().setFocusDuration(value);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "Unfocus: ${_settings['unfocusDuration']!.toInt().toString()} minutes",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: CupertinoSlider(
-                    value: _settings['unfocusDuration']!,
-                    min: 1,
-                    max: 60,
-                    onChanged: (value) {
-                      setState(() {
-                        _settings['unfocusDuration'] = value;
-                      });
-                      UserPreferences().setUnfocusDuration(value);
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Require walking to unfocus",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+       floatingActionButton: IconButton(
+        icon: const Icon(Icons.settings, size: 30,),
+        onPressed: () => navigateToSettingsScreen(null),),
+       //FloatingActionButton.extended(
+      //   onPressed: () => navigateToSettingsScreen(null),
+      //   label: const Icon(Icons.settings),
+      //   elevation: 2.0,
+      // ),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/5.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Focus: ${_settings['focusDuration'].toInt().toString()} minutes",
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                      color: Colors.white,
                     ),
-                    const SizedBox(
-                      width: 10,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    child: CupertinoSlider(
+                      value: _settings['focusDuration'],
+                      min: 1,
+                      max: 60,
+                      onChanged: (value) {
+                        setState(() {
+                          _settings['focusDuration'] = value;
+                        });
+                        UserPreferences().setFocusDuration(value);
+                      },
                     ),
-                    Switch(
-                        value: _settings['requireWalking'],
-                        onChanged: (value) {
-                          setState(() {
-                            _settings['requireWalking'] = value;
-                          });
-                          UserPreferences().setRequireWalking(value);
-                        }),
-                  ],
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      saveAlarm();
-                    },
-                    child: Text("Start focus",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    "Unfocus: ${_settings['unfocusDuration']!.toInt().toString()} minutes",
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    child: CupertinoSlider(
+                      value: _settings['unfocusDuration']!,
+                      min: 1,
+                      max: 60,
+                      onChanged: (value) {
+                        setState(() {
+                          _settings['unfocusDuration'] = value;
+                        });
+                        UserPreferences().setUnfocusDuration(value);
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Require walking to unfocus",
                         style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
-                        )),
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Switch(
+                          value: _settings['requireWalking'],
+                          onChanged: (value) {
+                            setState(() {
+                              _settings['requireWalking'] = value;
+                            });
+                            UserPreferences().setRequireWalking(value);
+                          }),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        saveAlarm();
+                      },
+                      child: Text("Start focus",
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                          )),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
