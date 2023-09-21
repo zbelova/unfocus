@@ -43,21 +43,26 @@ dependencies:
   audioplayers: ^5.1.0
 
 
+
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.2
   flutter_test:
     sdk: flutter
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/images/icon.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
+flutter_native_splash:
+  color: "#8aaad8"
+
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
