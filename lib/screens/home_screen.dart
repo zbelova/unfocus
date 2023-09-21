@@ -166,11 +166,6 @@ class _HomePageState extends State<HomePage> {
        floatingActionButton: IconButton(
         icon: const Icon(Icons.settings, size: 30,),
         onPressed: () => navigateToSettingsScreen(null),),
-       //FloatingActionButton.extended(
-      //   onPressed: () => navigateToSettingsScreen(null),
-      //   label: const Icon(Icons.settings),
-      //   elevation: 2.0,
-      // ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -264,6 +259,7 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
+                       // Alarm.stop(28745);
                         saveAlarm();
                       },
                       child: Text("Start focus",

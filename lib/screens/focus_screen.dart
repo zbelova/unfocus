@@ -83,71 +83,73 @@ class _FocusScreenState extends State<FocusScreen> {
         child: SafeArea(
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text(
-                  'Focus',
-                  style: TextStyle(
-                    fontSize: 40,
-                    color: Color(0xFF565656),
-                  ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.10,
                 ),
-                Text(
-                  formatSecondsToMinutes(_current),
-                  style: const TextStyle(
-                    fontSize: 40,
-                    color: Color(0xFF565656),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _focusRunning
-                        ? IconButton(
-                            onPressed: () {
-                              if (_timer != null) _timer!.cancel();
-                              setState(() {
-                                _focusRunning = false;
-                                Alarm.stopAll();
-                              });
-                            },
-                            icon: const Icon(Icons.motion_photos_paused_outlined),
-                            iconSize: 40,
-                          )
-                        : IconButton(
-                            onPressed: () {
-                              _startTimer();
-                              _setNewAlarm();
-                            },
-                            icon: const Icon(Icons.play_arrow_rounded),
-                            iconSize: 40,
-                          ),
-
-                    IconButton(
-                      onPressed: () {
-                        if (_timer != null) _timer!.cancel();
-                        Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
-                      },
-                      icon: const Icon(Icons.stop_rounded),
-                      iconSize: 40,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.33,
+                  child: const Text(
+                    'Focus',
+                    style: TextStyle(
+                      fontSize: 40,
+                      color: Color(0xFF565656),
                     ),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     if (_timer != null) _timer!.cancel();
-                    //     Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
-                    //   },
-                    //   child: Text(
-                    //     "Stop",
-                    //     style: Theme.of(context).textTheme.titleLarge,
-                    //   ),
-                    // ),
-                  ],
-                )
+                  ),
+                ),
+                SizedBox(
+                  height: 250,
+                  child: Text(
+                    formatSecondsToMinutes(_current),
+                    style: const TextStyle(
+                      fontSize: 40,
+                      color: Color(0xFF565656),
+                    ),
+                  ),
+                ),
+                _buildPauseStop(context)
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Row _buildPauseStop(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _focusRunning
+            ? IconButton(
+                onPressed: () {
+                  if (_timer != null) _timer!.cancel();
+                  setState(() {
+                    _focusRunning = false;
+                    Alarm.stopAll();
+                  });
+                },
+                icon: const Icon(Icons.motion_photos_paused_outlined),
+                iconSize: 40,
+              )
+            : IconButton(
+                onPressed: () {
+                  _startTimer();
+                  _setNewAlarm();
+                },
+                icon: const Icon(Icons.play_arrow_rounded),
+                iconSize: 40,
+              ),
+        IconButton(
+          onPressed: () {
+            if (_timer != null) _timer!.cancel();
+            Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
+          },
+          icon: const Icon(Icons.stop_rounded),
+          iconSize: 40,
+        ),
+      ],
     );
   }
 }

@@ -61,7 +61,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   }
 
   void _setNewAlarm() {
-    if(_settings['showNotification']) {
+    if (_settings['showNotification']) {
       notificationService.showImmediateNotification();
     }
     final now = DateTime.now();
@@ -77,7 +77,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           now.second,
           now.millisecond,
           //).add(Duration(minutes: _settings['focusDuration'].round())),
-        ).add(Duration(seconds: 10)),
+        ).add(const Duration(seconds: 10)),
       ),
     ).then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FocusScreen(alarmSettings: widget.alarmSettings))));
   }
@@ -157,8 +157,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
           _buttonDelayed = false;
         });
       });
-    }
-    else {
+    } else {
       // _showTimer = true;
       // _startTimer();
     }
@@ -179,70 +178,216 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (_walkingRequired && !_movingComplete) const Text('Take your phone and walk around a bit or dance!'),
-              if (_walkingRequired && _movingComplete)
-                Column(
-                  children: [
-                    const Text('Great job!'),
-                    const Text('Now you can relax or continue walking'),
-                    if (!_musicTurnedOff)
-                      ElevatedButton(
-                        onPressed: () {
-                          Alarm.stopAll();
-                          setState(() {
-                            _musicTurnedOff = true;
-                          });
-                        },
-                        child: const Text('Turn off the music'),
-                      ),
-                  ],
-                ),
-              if(_showUnfocusText) const Text('Time to unfocus and relax'),
-              if (!_showTimer && !_buttonDelayed && _walkingRequired)
-                ElevatedButton(
-                    onPressed: () {
-                      Alarm.stopAll();
-                      setState(() {
-                        _showTimer = true;
-                        _unfocusRunning = true;
-                        _movingComplete = true;
-                        // _showUnfocusText = true;
-                      });
-                      _startTimer();
-                    },
-                    child: const Text("I don't want to walk :(")),
-              if (!_showTimer && !_walkingRequired)
-                ElevatedButton(
-                    onPressed: () {
-                      Alarm.stopAll();
-                      setState(() {
-                        _showTimer = true;
-                        _unfocusRunning = true;
-                        _movingComplete = true;
-                        _walkingRequired = false;
-                        _showUnfocusText = true;
-                      });
-                      _startTimer();
-                    },
-                    child: Text("Unfocus")),
-              //show timer widget
-              if (_showTimer)
-                Text(
-                  formatSecondsToMinutes(_current),
-                  style: const TextStyle(fontSize: 30),
-                ),
-
-              if (_showTimer) _buildPauseStop(context),
+      body: Container(
+        decoration: const BoxDecoration(
+          // image: DecorationImage(
+          //   image: AssetImage('assets/images/4.jpg'),
+          //   fit: BoxFit.cover,
+          // ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF87EDFF),
+              Color(0xFF018EC7),
+            ],
+            stops: [
+              0.1,
+              1.0,
             ],
           ),
         ),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.10,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.36,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (_walkingRequired && !_movingComplete) _buildWalkingHeader(context),
+                      _buildGreatJob(context),
+                    ],
+                  ),
+                ),
+                if (!_showTimer && !_walkingRequired) _buildUnfocusButton(),
+                if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
+                _buildTimer(),
+                _buildDontWantToWalk(),
+                if (_showTimer) _buildPauseStop(context),
+              ],
+            ),
+          ),
+        ),
       ),
+    );
+  }
+
+  SizedBox _buildDontWantToWalk() {
+    return SizedBox(
+      child: (!_showTimer && !_buttonDelayed && _walkingRequired)
+          ? ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF85E3FF),
+              ),
+              onPressed: () {
+                Alarm.stopAll();
+                setState(() {
+                  _showTimer = true;
+                  _unfocusRunning = true;
+                  _movingComplete = true;
+                  _showUnfocusText = true;
+                });
+                _startTimer();
+              },
+              child: const Text(
+                "I don't want to walk :(",
+                style: TextStyle(color: Color(0xFF0387B0), fontSize: 12),
+              ),
+            )
+          : Container(),
+    );
+  }
+
+  SizedBox _buildTimer() {
+    return SizedBox(
+        height: 250,
+        child: (_showTimer)
+            ? Text(
+                formatSecondsToMinutes(_current),
+                style: const TextStyle(
+                  fontSize: 40,
+                  color: Color(0xFF484848),
+                ),
+              )
+            : Container());
+  }
+
+  Padding _buildProgress() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: LinearProgressIndicator(
+        value: _movingDuration / _settings['walkingDuration'],
+        minHeight: 25,
+        borderRadius: BorderRadius.circular(10),
+        backgroundColor: Color(0xFFC6FAFF),
+        color: Color(0xFF01AADA),
+      ),
+    );
+  }
+
+  ElevatedButton _buildUnfocusButton() {
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
+        onPressed: () {
+          Alarm.stopAll();
+          setState(() {
+            _showTimer = true;
+            _unfocusRunning = true;
+            _movingComplete = true;
+            _walkingRequired = false;
+            _showUnfocusText = true;
+          });
+          _startTimer();
+        },
+        child: const Text("Unfocus", style: TextStyle(color: Color(0xFF0387B0), fontSize: 20, height: 4)));
+  }
+
+  Column _buildGreatJob(BuildContext context) {
+    return Column(
+      children: [
+        if (_walkingRequired && _movingComplete && !_showUnfocusText)
+          Column(
+            children: [
+              const Text(
+                'Great job!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Color(0xFF484848),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                child: const Text(
+                  'Now you can relax or continue walking',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF484848),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+            ],
+          ),
+        if (!_musicTurnedOff && !_showUnfocusText && _walkingRequired && _movingComplete)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
+            onPressed: () {
+              Alarm.stopAll();
+              setState(() {
+                _musicTurnedOff = true;
+              });
+            },
+            child: const Text(
+              'Turn off the music',
+              style: TextStyle(color: Color(0xFF0387B0)),
+            ),
+          ),
+        if (_showUnfocusText && _movingComplete)
+          const Text(
+            'Time to unfocus and relax',
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF484848),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Column _buildWalkingHeader(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.75,
+          child: const Text(
+            'Take your phone and walk around or dance!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF484848),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 60,
+        ),
+        Container(
+          height: 130,
+          width: 100,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/walk.gif'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
     );
   }
 
@@ -251,38 +396,28 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _unfocusRunning
-            ? Container(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_timer != null) _timer!.cancel();
-                    setState(() {
-                      _unfocusRunning = false;
-                    });
-                  },
-                  child: Text(
-                    "Pause",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
+            ? IconButton(
+                onPressed: () {
+                  if (_timer != null) _timer!.cancel();
+                  setState(() {
+                    _unfocusRunning = false;
+                  });
+                },
+                icon: const Icon(Icons.motion_photos_paused_outlined),
+                iconSize: 40,
               )
-            : Container(
-                child: ElevatedButton(
-                  onPressed: _startTimer,
-                  child: Text(
-                    "Resume",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
+            : IconButton(
+                onPressed: _startTimer,
+                icon: const Icon(Icons.play_arrow_rounded),
+                iconSize: 40,
               ),
-        ElevatedButton(
+        IconButton(
           onPressed: () {
             if (_timer != null) _timer!.cancel();
             Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
           },
-          child: Text(
-            "Stop",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          icon: const Icon(Icons.stop_rounded),
+          iconSize: 40,
         ),
       ],
     );

@@ -16,16 +16,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   final List _music = [
     [
+      'Meditation',
+      'assets/meditation.mp3',
+    ],
+    [
       'Trapsoul',
       'assets/trapsoul.mp3',
     ],
     [
       'R&B',
       'assets/rb.mp3',
-    ],
-    [
-      'Meditation',
-      'assets/meditation.mp3',
     ],
     [
       'Dance 1',

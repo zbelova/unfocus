@@ -38,7 +38,7 @@ class UserPreferences {
 
   Future setLoopAudio(bool loopAudio) async => await _preferences?.setBool('loopAudio', loopAudio);
 
-  bool getVibration() => _preferences?.getBool('vibration') ?? true;
+  bool getVibration() => _preferences?.getBool('vibration') ?? false;
 
   Future setVibration(bool vibration) async => await _preferences?.setBool('vibration', vibration);
 
@@ -50,7 +50,7 @@ class UserPreferences {
 
   Future setShowNotification(bool showNotification) async => await _preferences?.setBool('showNotification', showNotification);
 
-  String getAssetAudionPath() => _preferences?.getString('assetAudionPath') ?? 'assets/trapsoul.mp3';
+  String getAssetAudionPath() => _preferences?.getString('assetAudionPath') ?? 'assets/meditation.mp3';
 
   Future setAssetAudionPath(String assetAudionPath) async => await _preferences?.setString('assetAudionPath', assetAudionPath);
 }
