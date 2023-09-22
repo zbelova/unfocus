@@ -3,12 +3,10 @@ import 'dart:async';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:unfocus/screens/focus_screen.dart';
 import 'package:unfocus/screens/home_screen.dart';
 
 import '../data/user_preferences.dart';
 import '../helpers/globals.dart';
-import '../helpers/notifications.dart';
 
 class UnfocusScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
@@ -35,12 +33,10 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
   bool _musicTurnedOff = false;
   bool _showUnfocusText = false;
 
-  late final NotificationService notificationService;
-
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
-    Alarm.stopAll();
+
     _setFocusAlarm();
     setState(() {
       _unfocusRunning = true;
@@ -60,12 +56,13 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
 
   void _setFocusAlarm() {
     final now = DateTime.now();
-    Alarm.stopAll();
+    //Alarm.stopAll();
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
+        id:222,
         notificationTitle: 'Focus!',
         notificationBody: 'Keep focused on your goals',
-        assetAudioPath: 'assets/1-second-of-silence.mp3',
+        assetAudioPath: 'assets/pop.mp3',
         dateTime: DateTime(
           now.year,
           now.month,
@@ -74,9 +71,9 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
           now.minute,
           now.second,
           now.millisecond,
-        ).add(Duration(seconds: _current)),
+        //).add(Duration(seconds: _current)),
           //TODO убрать на настоящие
-        //).add(const Duration(seconds: 10)),
+        ).add(const Duration(seconds: 10)),
       ),
     );
   }
@@ -147,7 +144,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    //_current = _settings['unfocusDuration'].floor() * 60;
     _walkingRequired = _settings['requireWalking'];
     if (_walkingRequired) {
       _buttonDelayed = true;
@@ -206,7 +202,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                   ),
                 ),
                 if (!_showTimer && !_walkingRequired) _buildUnfocusButton(),
-                // if (!_showTimer && _walkingRequired && !_movingComplete) _buildProgress(),
                 _buildTimer(),
                 _buildDontWantToWalk(),
                 if (_showTimer) _buildPauseStop(context),
@@ -226,7 +221,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                 backgroundColor: const Color(0xFF85E3FF),
               ),
               onPressed: () {
-                Alarm.stopAll();
+               // Alarm.stopAll();
                 setState(() {
                   _showTimer = true;
                   _unfocusRunning = true;
@@ -286,7 +281,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
         minHeight: 25,
         borderRadius: BorderRadius.circular(10),
         backgroundColor: const Color(0xFFC6FAFF),
-        color: const Color(0xFF01AADA),
+        color: const Color(0xFF35E87E),
       ),
     );
   }
@@ -295,7 +290,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
         onPressed: () {
-          //Alarm.stopAll();
+          Alarm.stopAll();
           setState(() {
             _showTimer = true;
             _unfocusRunning = true;
@@ -304,6 +299,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             _showUnfocusText = true;
           });
           //_setFocusAlarm();
+          //Alarm.stopAll();
           _startTimer();
         },
         child: const Text("Unfocus", style: TextStyle(color: Color(0xFF0387B0), fontSize: 20, height: 4)));
@@ -342,26 +338,30 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               ),
             ],
           ),
-        if (!_musicTurnedOff && !_showUnfocusText && _walkingRequired && _movingComplete)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
-            onPressed: () {
-              Alarm.stopAll();
-              setState(() {
-                _musicTurnedOff = true;
-              });
-            },
-            child: const Text(
-              'Turn off the music',
-              style: TextStyle(color: Color(0xFF0387B0)),
-            ),
-          ),
+
         if (_showUnfocusText && _movingComplete)
           const Text(
             'Time to unfocus and relax',
             style: TextStyle(
               fontSize: 20,
               color: Color(0xFF484848),
+            ),
+          ),
+        if (!_musicTurnedOff &&  _walkingRequired && _movingComplete)
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
+              onPressed: () {
+                Alarm.stop(111);
+                setState(() {
+                  _musicTurnedOff = true;
+                });
+              },
+              child: const Text(
+                'Turn off the music',
+                style: TextStyle(color: Color(0xFF0387B0)),
+              ),
             ),
           ),
       ],
@@ -412,6 +412,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                   if (_timer != null) _timer!.cancel();
                   Alarm.stopAll();
                   setState(() {
+                    _musicTurnedOff = true;
                     _unfocusRunning = false;
                   });
                 },

@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void saveAlarm() {
-    setState(() => loading = true);
+    //setState(() => loading = true);
     _settings = {
       'unfocusDuration': UserPreferences().getUnfocusDuration(),
       'focusDuration': UserPreferences().getFocusDuration(),
@@ -115,20 +115,20 @@ class _HomePageState extends State<HomePage> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-    final alarmSettings = buildAlarmSettings();
-    Alarm.set(alarmSettings: alarmSettings).then((res) {
-      if (res) {
+     final alarmSettings = buildAlarmSettings();
+    // Alarm.set(alarmSettings: alarmSettings).then((res) {
+    //   if (res) {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => FocusScreen(
                       alarmSettings: alarmSettings,
-                    )));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error saving alarm')));
-      }
-    });
-    setState(() => loading = false);
+                     )));
+    //   } else {
+    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error saving alarm')));
+    //   }
+    // });
+    //setState(() => loading = false);
   }
 
   AlarmSettings buildAlarmSettings() {

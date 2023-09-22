@@ -43,6 +43,7 @@ class _FocusScreenState extends State<FocusScreen> {
     final now = DateTime.now();
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
+        id: 111,
         notificationTitle: 'Unfocus!',
         notificationBody: 'Take a break',
         assetAudioPath: UserPreferences().getAssetAudionPath(),
@@ -54,9 +55,9 @@ class _FocusScreenState extends State<FocusScreen> {
           now.minute,
           now.second,
           now.millisecond,
-        ).add(Duration(seconds: _current)),
+        //).add(Duration(seconds: _current)),
           //TODO убрать на настоящие
-        //).add(Duration(seconds: 10)),
+        ).add(Duration(seconds: 10)),
       ),
     );
   }
@@ -161,7 +162,6 @@ class _FocusScreenState extends State<FocusScreen> {
             : IconButton(
                 onPressed: () {
                   _startTimer();
-                  // _setUnfocusAlarm();
                 },
                 icon: const Icon(Icons.play_arrow_rounded),
                 iconSize: 40,
