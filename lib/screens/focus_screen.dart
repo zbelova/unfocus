@@ -55,9 +55,9 @@ class _FocusScreenState extends State<FocusScreen> {
           now.minute,
           now.second,
           now.millisecond,
-        //).add(Duration(seconds: _current)),
+        ).add(Duration(seconds: _current)),
           //TODO убрать на настоящие
-        ).add(Duration(seconds: 10)),
+        //).add(Duration(seconds: 10)),
       ),
     );
   }

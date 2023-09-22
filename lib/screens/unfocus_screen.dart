@@ -63,6 +63,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
         notificationTitle: 'Focus!',
         notificationBody: 'Keep focused on your goals',
         assetAudioPath: 'assets/pop.mp3',
+        loopAudio: false,
         dateTime: DateTime(
           now.year,
           now.month,
@@ -71,9 +72,9 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
           now.minute,
           now.second,
           now.millisecond,
-        //).add(Duration(seconds: _current)),
+        ).add(Duration(seconds: _current)),
           //TODO убрать на настоящие
-        ).add(const Duration(seconds: 10)),
+        //).add(const Duration(seconds: 10)),
       ),
     );
   }
