@@ -57,7 +57,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
   void _setFocusAlarm() {
     final now = DateTime.now();
     //Alarm.stopAll();
-    var sound = (widget.alarmSettings.assetAudioPath == 'assets/1-second-of-silence.mp3')?'assets/1-second-of-silence.mp3':'assets/pop.mp3';
+    var sound = (widget.alarmSettings.assetAudioPath == 'assets/1-second-of-silence.mp3')?'assets/1-second-of-silence.mp3':'assets/pop-1.mp3';
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
         id:222,
@@ -300,8 +300,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             _walkingRequired = false;
             _showUnfocusText = true;
           });
-          //_setFocusAlarm();
-          //Alarm.stopAll();
           _startTimer();
         },
         child: const Text("Unfocus", style: TextStyle(color: Color(0xFF0387B0), fontSize: 20, height: 4)));
