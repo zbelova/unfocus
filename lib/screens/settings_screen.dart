@@ -34,7 +34,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     [
       'Dance 2',
       'assets/dance2.mp3',
-    ]
+    ],
+    [
+    'No sound',
+    'assets/1-second-of-silence.mp3',
+  ]
   ];
 
   @override

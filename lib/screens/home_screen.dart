@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-   // FlutterNativeSplash.remove();
+    // FlutterNativeSplash.remove();
     _loadAlarms();
     _alarmSubscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
@@ -68,14 +68,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
     print(alarmSettings.notificationTitle);
-    if(alarmSettings.notificationTitle=='Unfocus!') {
+    if (alarmSettings.notificationTitle == 'Unfocus!') {
       await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => UnfocusScreen(alarmSettings: alarmSettings),
           ));
-    }
-    else{
+    } else {
       await Navigator.push(
           context,
           MaterialPageRoute(
@@ -115,20 +114,13 @@ class _HomePageState extends State<HomePage> {
       'showNotification': UserPreferences().getShowNotification(),
       'assetAudionPath': UserPreferences().getAssetAudionPath(),
     };
-     final alarmSettings = buildAlarmSettings();
-    // Alarm.set(alarmSettings: alarmSettings).then((res) {
-    //   if (res) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FocusScreen(
-                      alarmSettings: alarmSettings,
-                     )));
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error saving alarm')));
-    //   }
-    // });
-    //setState(() => loading = false);
+    final alarmSettings = buildAlarmSettings();
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => FocusScreen(
+                  alarmSettings: alarmSettings,
+                )));
   }
 
   AlarmSettings buildAlarmSettings() {
@@ -142,9 +134,9 @@ class _HomePageState extends State<HomePage> {
       now.minute,
       now.second,
       now.millisecond,
-   // ).add(Duration(seconds: _settings['focusDuration'].floor() * 60));
-      //TODO убрать на настоящие
-    ).add(Duration(seconds: 10));
+    ).add(Duration(seconds: _settings['focusDuration'].floor() * 60));
+    //TODO убрать на настоящие
+    // ).add(Duration(seconds: 10));
     if (dateTime.isBefore(DateTime.now())) {
       dateTime = dateTime.add(const Duration(days: 1));
     }
@@ -159,7 +151,6 @@ class _HomePageState extends State<HomePage> {
       notificationBody: _settings['showNotification'] ? 'Take a break' : null,
       assetAudioPath: _settings['assetAudionPath'],
       stopOnNotificationOpen: false,
-
     );
     return alarmSettings;
   }
@@ -175,9 +166,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-       floatingActionButton: IconButton(
-        icon: const Icon(Icons.settings, size: 30,),
-        onPressed: () => navigateToSettingsScreen(null),),
+      floatingActionButton: IconButton(
+        icon: const Icon(
+          Icons.settings,
+          size: 30,
+        ),
+        onPressed: () => navigateToSettingsScreen(null),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -272,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                       // Alarm.stop(28745);
+                        // Alarm.stop(28745);
                         saveAlarm();
                       },
                       child: Text("Start focus",
@@ -290,4 +285,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

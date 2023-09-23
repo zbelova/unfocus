@@ -57,12 +57,13 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
   void _setFocusAlarm() {
     final now = DateTime.now();
     //Alarm.stopAll();
+    var sound = (widget.alarmSettings.assetAudioPath == 'assets/1-second-of-silence.mp3')?'assets/1-second-of-silence.mp3':'assets/pop.mp3';
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
         id:222,
         notificationTitle: 'Focus!',
         notificationBody: 'Keep focused on your goals',
-        assetAudioPath: 'assets/pop.mp3',
+        assetAudioPath: sound,
         loopAudio: false,
         dateTime: DateTime(
           now.year,
@@ -348,7 +349,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               color: Color(0xFF484848),
             ),
           ),
-        if (!_musicTurnedOff &&  _walkingRequired && _movingComplete)
+        if (!_musicTurnedOff &&  _walkingRequired && _movingComplete && widget.alarmSettings.assetAudioPath != 'assets/1-second-of-silence.mp3')
           Padding(
             padding: const EdgeInsets.only(top: 20.0),
             child: ElevatedButton(
