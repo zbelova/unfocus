@@ -292,7 +292,9 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
         onPressed: () {
-          Alarm.stopAll();
+          //Alarm.stopAll();
+          Alarm.stop(111);
+          Alarm.stop(222);
           setState(() {
             _showTimer = true;
             _unfocusRunning = true;
@@ -410,7 +412,9 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
-                  Alarm.stopAll();
+                  //Alarm.stopAll();
+                  Alarm.stop(111);
+                  Alarm.stop(222);
                   setState(() {
                     _musicTurnedOff = true;
                     _unfocusRunning = false;
@@ -430,6 +434,8 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
         IconButton(
           onPressed: () {
             if (_timer != null) _timer!.cancel();
+            Alarm.stop(111);
+            Alarm.stop(222);
             Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
           },
           icon: const Icon(Icons.stop_rounded),

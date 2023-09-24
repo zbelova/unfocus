@@ -20,7 +20,9 @@ class _FocusScreenState extends State<FocusScreen> {
   int _current = UserPreferences().getFocusDuration().floor() * 60;
 
   void _startTimer() {
-    Alarm.stopAll();
+    //Alarm.stopAll();
+    Alarm.stop(222);
+    Alarm.stop(111);
     _setUnfocusAlarm();
     setState(() {
       _focusRunning = true;
@@ -151,7 +153,9 @@ class _FocusScreenState extends State<FocusScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
-                  Alarm.stopAll();
+                 // Alarm.stopAll();
+                  Alarm.stop(222);
+                  Alarm.stop(111);
                   setState(() {
                     _focusRunning = false;
                   });
@@ -169,6 +173,8 @@ class _FocusScreenState extends State<FocusScreen> {
         IconButton(
           onPressed: () {
             if (_timer != null) _timer!.cancel();
+            Alarm.stop(222);
+            Alarm.stop(111);
             Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
           },
           icon: const Icon(Icons.stop_rounded),

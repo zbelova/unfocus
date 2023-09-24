@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-    print(alarmSettings.notificationTitle);
+   // print(alarmSettings.notificationTitle);
     if (alarmSettings.notificationTitle == 'Unfocus!') {
       await Navigator.push(
           context,
@@ -103,6 +103,7 @@ class _HomePageState extends State<HomePage> {
 
   void saveAlarm() {
     //setState(() => loading = true);
+    Alarm.stopAll();
     _settings = {
       'unfocusDuration': UserPreferences().getUnfocusDuration(),
       'focusDuration': UserPreferences().getFocusDuration(),
