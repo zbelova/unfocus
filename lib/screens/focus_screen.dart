@@ -21,8 +21,6 @@ class _FocusScreenState extends State<FocusScreen> {
 
   void _startTimer() {
     Alarm.stopAll();
-   // Alarm.stop(222);
-    //Alarm.stop(111);
     _setUnfocusAlarm();
     setState(() {
       _focusRunning = true;
@@ -58,7 +56,7 @@ class _FocusScreenState extends State<FocusScreen> {
           now.second,
           now.millisecond,
         ).add(Duration(seconds: _current)),
-          //TODO убрать на настоящие
+          //TODO для тестов
         //).add(Duration(seconds: 10)),
       ),
     );
@@ -90,7 +88,6 @@ class _FocusScreenState extends State<FocusScreen> {
         child: SafeArea(
           child: Center(
             child: Column(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.10,

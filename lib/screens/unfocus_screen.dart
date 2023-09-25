@@ -74,7 +74,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
           now.second,
           now.millisecond,
         ).add(Duration(seconds: _current)),
-          //TODO убрать на настоящие
+          //TODO для тестов
         //).add(const Duration(seconds: 10)),
       ),
     );
@@ -299,8 +299,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
         onPressed: () {
           Alarm.stopAll();
           //print('Unfocus button pressed - ${DateTime.now()}');
-          //Alarm.stop(111);
-          //Alarm.stop(222);
           setState(() {
             _showTimer = true;
             _unfocusRunning = true;
@@ -363,7 +361,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
               onPressed: () {
                 Alarm.stop(111);
-                //Alarm.stopAll();
                 //print('Music off button pressed - ${DateTime.now()}');
                 setState(() {
                   _musicTurnedOff = true;

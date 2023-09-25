@@ -29,8 +29,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    // FlutterNativeSplash.remove();
     _loadAlarms();
     _alarmSubscription ??= Alarm.ringStream.stream.listen(
       (alarmSettings) => navigateToRingScreen(alarmSettings),
@@ -135,7 +133,7 @@ class _HomePageState extends State<HomePage> {
       now.second,
       now.millisecond,
     ).add(Duration(seconds: _settings['focusDuration'].floor() * 60));
-    //TODO убрать на настоящие
+    //TODO для тестов
     // ).add(Duration(seconds: 10));
     if (dateTime.isBefore(DateTime.now())) {
       dateTime = dateTime.add(const Duration(days: 1));
@@ -153,12 +151,6 @@ class _HomePageState extends State<HomePage> {
       stopOnNotificationOpen: false,
     );
     return alarmSettings;
-  }
-
-  void deleteAlarm() {
-    Alarm.stop(widget.alarmSettings!.id).then((res) {
-      if (res) Navigator.pop(context, true);
-    });
   }
 
   @override
