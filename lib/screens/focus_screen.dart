@@ -46,8 +46,8 @@ class _FocusScreenState extends State<FocusScreen> {
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
         id: 111,
-        notificationTitle: 'Unfocus!',
-        notificationBody: 'Take a break',
+        notificationTitle: UserPreferences().getShowNotification() ? 'Unfocus!' : null,
+        notificationBody: UserPreferences().getShowNotification() ?'Take a break' : null,
         assetAudioPath: UserPreferences().getAssetAudionPath(),
         dateTime: DateTime(
           now.year,

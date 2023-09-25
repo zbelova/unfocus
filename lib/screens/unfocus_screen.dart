@@ -61,8 +61,8 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
     Alarm.set(
       alarmSettings: widget.alarmSettings.copyWith(
         id:222,
-        notificationTitle: 'Focus!',
-        notificationBody: 'Keep focused on your goals',
+        notificationTitle: _settings['showNotification'] ? 'Focus!' : null,
+        notificationBody: _settings['showNotification'] ? 'Time to focus' : null,
         assetAudioPath: sound,
         loopAudio: false,
         dateTime: DateTime(
