@@ -36,7 +36,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
   StreamSubscription<UserAccelerometerEvent>? _accelerometerEventsSubscription;
 
   void _startTimer() {
-
+    _stopSensors();
     _setFocusAlarm();
     setState(() {
       _unfocusRunning = true;
@@ -107,6 +107,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               _movingComplete = true;
               _showTimer = true;
               _startTimer();
+              //print('Sensors Timer started - ${DateTime.now()}');
               _accelerometerEventsSubscription!.cancel();
             }
             _movementStartTime = movementEndTime;
@@ -158,12 +159,16 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
     _startSensors();
   }
 
-  @override
-  void dispose() {
-    if (_timer != null) _timer!.cancel();
+  void _stopSensors() {
     if (_accelerometerEventsSubscription != null) {
       _accelerometerEventsSubscription?.cancel();
     }
+  }
+
+  @override
+  void dispose() {
+    if (_timer != null) _timer!.cancel();
+    _stopSensors();
     super.dispose();
   }
 
@@ -223,7 +228,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                 backgroundColor: const Color(0xFF85E3FF),
               ),
               onPressed: () {
-               // Alarm.stopAll();
                 setState(() {
                   _showTimer = true;
                   _unfocusRunning = true;
@@ -231,6 +235,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                   _showUnfocusText = true;
                 });
                 _startTimer();
+               // print('No walk Timer started - ${DateTime.now()}');
               },
               child: const Text(
                 "I don't want to walk :(",
@@ -292,9 +297,10 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
         onPressed: () {
-          //Alarm.stopAll();
-          Alarm.stop(111);
-          Alarm.stop(222);
+          Alarm.stopAll();
+          //print('Unfocus button pressed - ${DateTime.now()}');
+          //Alarm.stop(111);
+          //Alarm.stop(222);
           setState(() {
             _showTimer = true;
             _unfocusRunning = true;
@@ -303,6 +309,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             _showUnfocusText = true;
           });
           _startTimer();
+          //print('Unfocus button Timer started - ${DateTime.now()}');
         },
         child: const Text("Unfocus", style: TextStyle(color: Color(0xFF0387B0), fontSize: 20, height: 4)));
   }
@@ -356,6 +363,8 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC6FAFF)),
               onPressed: () {
                 Alarm.stop(111);
+                //Alarm.stopAll();
+                //print('Music off button pressed - ${DateTime.now()}');
                 setState(() {
                   _musicTurnedOff = true;
                 });
@@ -412,9 +421,10 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
-                  //Alarm.stopAll();
-                  Alarm.stop(111);
-                  Alarm.stop(222);
+                  Alarm.stopAll();
+                  //print('Pause button pressed - ${DateTime.now()}');
+                  // Alarm.stop(111);
+                  // Alarm.stop(222);
                   setState(() {
                     _musicTurnedOff = true;
                     _unfocusRunning = false;
@@ -426,7 +436,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
             : IconButton(
                 onPressed: () {
                   _startTimer();
-                  //_setFocusAlarm();
+                  //print('Pause Timer started - ${DateTime.now()}');
                 },
                 icon: const Icon(Icons.play_arrow_rounded),
                 iconSize: 40,
@@ -434,8 +444,9 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
         IconButton(
           onPressed: () {
             if (_timer != null) _timer!.cancel();
-            Alarm.stop(111);
-            Alarm.stop(222);
+            // Alarm.stop(111);
+            // Alarm.stop(222);
+            //print('Stop button pressed - ${DateTime.now()}');
             Alarm.stopAll().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage())));
           },
           icon: const Icon(Icons.stop_rounded),

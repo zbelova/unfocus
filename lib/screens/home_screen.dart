@@ -67,7 +67,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
-   // print(alarmSettings.notificationTitle);
     if (alarmSettings.notificationTitle == 'Unfocus!') {
       await Navigator.push(
           context,

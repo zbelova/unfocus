@@ -20,9 +20,9 @@ class _FocusScreenState extends State<FocusScreen> {
   int _current = UserPreferences().getFocusDuration().floor() * 60;
 
   void _startTimer() {
-    //Alarm.stopAll();
-    Alarm.stop(222);
-    Alarm.stop(111);
+    Alarm.stopAll();
+   // Alarm.stop(222);
+    //Alarm.stop(111);
     _setUnfocusAlarm();
     setState(() {
       _focusRunning = true;
