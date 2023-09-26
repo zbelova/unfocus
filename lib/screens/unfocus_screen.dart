@@ -210,7 +210,7 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                 ),
                 if (!_showTimer && !_walkingRequired) _buildUnfocusButton(),
                 _buildTimer(),
-                _buildDontWantToWalk(),
+                //_buildDontWantToWalk(),
                 if (_showTimer) _buildPauseStop(context),
               ],
             ),
