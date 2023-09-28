@@ -107,7 +107,6 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
               _movingComplete = true;
               _showTimer = true;
               _startTimer();
-              //print('Sensors Timer started - ${DateTime.now()}');
               _accelerometerEventsSubscription!.cancel();
             }
             _movementStartTime = movementEndTime;
@@ -262,11 +261,13 @@ class _UnfocusScreenState extends State<UnfocusScreen> {
                 child: Align(
                   alignment: Alignment.center,
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.02
+                    ),
                     child: Text(
                       formatSecondsToMinutes(_current),
-                      style: const TextStyle(
-                        fontSize: 40,
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.12,
                         color: Color(0xFF484848),
                       ),
                     ),

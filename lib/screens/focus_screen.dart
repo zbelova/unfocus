@@ -45,7 +45,7 @@ class _FocusScreenState extends State<FocusScreen> {
       alarmSettings: widget.alarmSettings.copyWith(
         id: 111,
         notificationTitle: UserPreferences().getShowNotification() ? 'Unfocus!' : null,
-        notificationBody: UserPreferences().getShowNotification() ?'Take a break' : null,
+        notificationBody: UserPreferences().getShowNotification() ? 'Take a break' : null,
         assetAudioPath: UserPreferences().getAssetAudionPath(),
         dateTime: DateTime(
           now.year,
@@ -56,7 +56,7 @@ class _FocusScreenState extends State<FocusScreen> {
           now.second,
           now.millisecond,
         ).add(Duration(seconds: _current)),
-          //TODO для тестов
+        //TODO для тестов
         //).add(Duration(seconds: 10)),
       ),
     );
@@ -118,11 +118,13 @@ class _FocusScreenState extends State<FocusScreen> {
                           child: Align(
                             alignment: Alignment.center,
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.02
+                              ),
                               child: Text(
                                 formatSecondsToMinutes(_current),
-                                style: const TextStyle(
-                                  fontSize: 40,
+                                style: TextStyle(
+                                  fontSize: MediaQuery.of(context).size.width * 0.12,
                                   color: Color(0xFF565656),
                                 ),
                               ),
@@ -150,7 +152,7 @@ class _FocusScreenState extends State<FocusScreen> {
             ? IconButton(
                 onPressed: () {
                   if (_timer != null) _timer!.cancel();
-                 // Alarm.stopAll();
+                  // Alarm.stopAll();
                   Alarm.stop(222);
                   Alarm.stop(111);
                   setState(() {

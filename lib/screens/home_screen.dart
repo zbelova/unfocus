@@ -174,7 +174,9 @@ class _HomePageState extends State<HomePage> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width * 0.03,
+            ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -230,10 +232,10 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         "Require walking to unfocus",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -264,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text("Start focus",
                           style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.headlineMedium!.fontSize,
+                            fontSize: MediaQuery.of(context).size.width * 0.05,
                           )),
                     ),
                   ),
